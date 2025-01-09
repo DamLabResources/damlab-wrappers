@@ -1,0 +1,5 @@
+use-conda: true
+conda-prefix: '../../.snakemake/conda'
+conda-frontend: mamba
+cores: 1
+forceall: true

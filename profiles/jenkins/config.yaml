@@ -1,0 +1,5 @@
+use-conda: true
+conda-prefix: '~/conda'
+conda-frontend: conda
+cores: 1
+forceall: true

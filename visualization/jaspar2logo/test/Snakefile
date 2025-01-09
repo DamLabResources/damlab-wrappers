@@ -1,0 +1,18 @@
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test.png',
+        'test.labeled.png'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+
+rule:
+    input:
+        jaspar = 'test.pfm',
+    output:
+        logo = 'test.png',
+    wrapper:
+        f"file:../"
+        
