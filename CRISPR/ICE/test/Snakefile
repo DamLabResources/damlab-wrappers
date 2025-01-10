@@ -1,0 +1,34 @@
+
+rule all:
+    input:
+        multiext('check.', 
+                 'all.json',
+                 'all.txt',
+                 'contribs.json',
+                 'contribs.txt',
+                 'indel.json',
+                 'trace.json',
+                 'windowed.json',
+                 'windowed.txt'),
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+
+rule:
+    input:
+        control = 'good_example_control.ab1',
+        edited = 'good_example_edited.ab1',
+    params:
+        target = 'AACCAGTTGCAGGCGCCCCA'
+    output:
+        all_json = temp('check.all.json'),
+        all_txt = temp('check.all.txt'),
+        contribs_json = temp('check.contribs.json'),
+        contribs_txt = temp('check.contribs.txt'),
+        indel_json = temp('check.indel.json'),
+        trace_json = temp('check.trace.json'),
+        windowed_json = temp('check.windowed.json'),
+        windowed_txt = temp('check.windowed.txt')
+    wrapper:
+        f"file:../"
+        
