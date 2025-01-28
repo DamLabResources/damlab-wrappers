@@ -18,6 +18,11 @@ models_dir = snakemake.params.get("models_directory", "")
 dorado_path = snakemake.params.get("dorado_path", "dorado")  # default to 'dorado' in PATH
 models_dir_arg = f"--models-directory {models_dir}" if models_dir else ""
 
+# Handle recursive mode for directories
+recursive_arg = ""
+if path.isdir(pod5_file):
+    recursive_arg = "--recursive"
+
 # Handle reference - now optional
 reference_arg = ""
 if hasattr(snakemake.input, 'reference'):
@@ -45,6 +50,7 @@ shell(
     f" {threads_arg}"
     f" {models_dir_arg}"
     f" {reference_arg}"
+    f" {recursive_arg}"
     f" {model}"
     f" {pod5_file}"
     f" > {output_bam}"

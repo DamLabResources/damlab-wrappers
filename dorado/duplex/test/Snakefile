@@ -5,17 +5,31 @@ TEST_DATA_DIR = join(wd, '../../tests')
 
 rule all:
     input:
-        'test.bam'
+        'test.bam',
+        'test_dir.bam'
     conda: 'env.yaml'
     shell: "pytest tests.py"
 
-rule test_duplex:
+rule test_duplex_single:
     input:
         pod = join(TEST_DATA_DIR, 'filtered.pod5')
     output:
         temp('test.bam')
     log:
         temp('test.log')
+    threads: 2
+    resources:
+        gpu = 'all'
+    wrapper:
+        "file:../"
+
+rule test_duplex_directory:
+    input:
+        pod = TEST_DATA_DIR  # directory containing filtered.pod5
+    output:
+        temp('test_dir.bam')
+    log:
+        temp('test_dir.log')
     threads: 2
     resources:
         gpu = 'all'
