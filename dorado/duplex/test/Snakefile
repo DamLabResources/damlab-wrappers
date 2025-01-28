@@ -1,0 +1,23 @@
+from os.path import join
+
+wd = workflow.basedir
+TEST_DATA_DIR = join(wd, '../../tests')
+
+rule all:
+    input:
+        'test.bam'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_duplex:
+    input:
+        pod = join(TEST_DATA_DIR, 'filtered.pod5')
+    output:
+        temp('test.bam')
+    log:
+        temp('test.log')
+    threads: 2
+    resources:
+        gpu = 'all'
+    wrapper:
+        "file:../"

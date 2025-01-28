@@ -1,0 +1,24 @@
+name: dorado duplex
+description: Wrapper for running dorado duplex basecalling
+authors:
+  - Will Dampier, PhD
+input:
+  - pod5 file
+  - simplex model
+  - stereo model
+  - reference genome (optional)
+output:
+  - BAM file
+params:
+  - performance: performance settings string (optional)
+  - models_directory: directory for models (optional)
+  - dorado_path: path to dorado binary (optional, defaults to 'dorado')
+resources:
+  - gpu: the cuda device IDS of GPUs to use (optional, defaults to 'all')
+notes: |
+  * The wrapper runs dorado duplex to perform basecalling on pod5 files
+  * Requires dorado to be installed and available in PATH (unless dorado_path is specified)
+  * GPU resources will be used if specified in snakemake resources (gpu = 'all' or a string of cuda device IDs)
+  * Number of threads can be controlled via snakemake threads directive
+  * Reference genome is optional
+  * stderr is redirected to the snakemake log if specified 
