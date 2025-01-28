@@ -1,0 +1,46 @@
+from os.path import join
+
+wd = workflow.basedir
+TEST_DATA_DIR = join(wd, '../../tests')
+
+rule all:
+    input:
+        directory('test_bam'),
+        directory('test_fastq')
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+
+rule duplex_single:
+    input:
+        pod = join(TEST_DATA_DIR, 'filtered.pod5')
+    output:
+        temp('basecalled.bam')
+    threads: 1
+    resources:
+        gpu = 'all'
+    wrapper:
+        "file:../../duplex"
+
+rule test_demux_bam:
+    input:
+        reads = 'basecalled.bam'
+    output:
+        temp(directory('test_bam'))
+    params:
+        kit_name = "SQK-NBD114-24",
+    threads: 2
+    wrapper:
+        "file:../" 
+
+rule test_demux_fastq:
+    input:
+        reads = 'basecalled.bam'
+    output:
+        temp(directory('test_fastq'))
+    params:
+        kit_name = "SQK-NBD114-24",
+        emit_fastq = True
+    threads: 2
+    wrapper:
+        "file:../" 
