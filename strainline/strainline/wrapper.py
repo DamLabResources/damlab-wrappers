@@ -63,6 +63,5 @@ if is_directory:
 else:
     with tempfile.TemporaryDirectory(delete=False) as tmpdir:
         cmd += f"-o {tmpdir}"
-        print(path_cmd + cmd)
         shell(path_cmd + cmd)
         shutil.move(join(tmpdir, "filter_by_abun", "haplotypes.final.fa"), output)

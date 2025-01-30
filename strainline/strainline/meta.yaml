@@ -10,24 +10,11 @@ output:
 params:
   - prefix: installation prefix for strainline
   - platform: sequencing platform (pb or ont)
-  - min_trimmed_len: minimum trimmed read length (optional)
-  - topk: choose top k seed reads (optional)
-  - min_ovlp_len: minimum read overlap length (optional)
-  - min_identity: minimum identity of overlaps (optional)
-  - min_seed_len: minimum seed read length (optional)
-  - max_oh: maximum overhang length for overlaps (optional)
-  - iter: number of iterations for contig extension (optional)
-  - max_gd: maximum global divergence for merging haplotypes (optional)
-  - max_ld: maximum local divergence for merging haplotypes (optional)
-  - max_co: maximum overhang length for contig contains (optional)
-  - min_abun: minimum abundance for filtering haplotypes (optional)
-  - rm_misassembly: break contigs at potential misassembled positions (optional)
-  - correct_err: perform error correction for input reads (optional)
-  - dsim: alignment similarity percentage for Daligner (optional)
+  - extra_args: extra arguments to pass to strainline
 notes: |
   * The wrapper runs strainline for haplotype-aware assembly of long reads
-  * Input must be in FASTA format
+  * Input must be in FASTQ format
   * Output can be either a directory with all results or a single FASTA file with haplotypes
-  * Requires strainline to be installed via the provided makefile
+  * Requires strainline to be installed via the provided makefile to the prefix defined in the params
   * Number of threads can be controlled via snakemake threads directive
   * stderr is redirected to the snakemake log if specified 

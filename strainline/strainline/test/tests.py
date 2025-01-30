@@ -1,5 +1,5 @@
-import pytest
 import os
+import pytest # type: ignore
 from Bio import SeqIO  # type: ignore
 
 def test_haplotypes_output_exists():

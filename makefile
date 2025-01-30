@@ -11,3 +11,9 @@ clean:
 	find . -type d -name ".snakemake" -exec rm -rf {} +
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type d -name "scratch" -exec rm -rf {} +
+	find . -type d -name "*.log" -exec rm -rf {} +
+
+very_clean:
+	make clean
+	find . -type d -name "venv" -exec rm -rf {} +
