@@ -1,6 +1,6 @@
 import pytest
 import os
-import pysam
+import pysam # type: ignore
 from pathlib import Path
 
 def test_output_dir_exists():

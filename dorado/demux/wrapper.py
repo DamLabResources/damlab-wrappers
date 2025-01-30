@@ -5,8 +5,12 @@ __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
 
-from snakemake.shell import shell
+from snakemake.shell import shell # type: ignore
 from os import path
+
+if "snakemake" not in locals():
+    #  Keeps linters happy but doesn't impact funtion
+    import snakemake # type: ignore
 
 # Extract arguments from snakemake object
 reads = snakemake.input.reads

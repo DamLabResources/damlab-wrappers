@@ -1,6 +1,6 @@
 import pytest
 import os
-import pysam
+import pysam # type: ignore
 
 def test_single_output_exists():
     """Test that single-input BAM file was created"""
