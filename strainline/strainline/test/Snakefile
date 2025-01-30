@@ -1,0 +1,46 @@
+from os.path import join
+
+wd = workflow.basedir
+PREFIX = join(wd, '../../venv')
+
+rule all:
+    input:
+        'scratch/test_haplotypes.fasta',
+        directory('scratch/test_directory')
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_strainline_haplotypes:
+    input:
+        'scratch/reads.fasta'
+    output:
+        haplotypes = temp('scratch/test_haplotypes.fasta')
+    params:
+        prefix = PREFIX,
+        platform = "ont"
+    log:
+        temp('scratch/test_haplotypes.log')
+    threads: 2
+    wrapper:
+        "file:../"
+
+rule test_strainline_directory:
+    input:
+        'scratch/reads.fasta'
+    output:
+        directory = temp(directory('scratch/test_directory'))
+    params:
+        prefix = PREFIX,
+        platform = "ont"
+    log:
+        temp('scratch/test_directory.log')
+    threads: 2
+    wrapper:
+        "file:../" 
+
+rule unpack_reads:
+    input:
+        'reads.fq.gz'
+    output:
+        temp('scratch/reads.fasta')
+    shell: "gzip -kdc {input} > {output}"
