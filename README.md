@@ -7,7 +7,24 @@ A collection of snakemake wrappers that are not suitable for the wider snakemake
 A description of the different toolset groups.
 
 
-### Visualization
+## Dorado basecalling
+
+This package contains wrappers for the Nanopore dorado tool.
+
+ - `dorado/duplex` : A wrapper for the Nanopore dorado duplex basecalling tool.
+ - `dorado/demux` : A wrapper for the Nanopore dorado demultiplexing tool.
+ - more to come as needed...
+
+
+## Strainline
+
+This package contains wrappers for the Strainline reference free haplotype assembly tool.
+This package requires the `strainline` tool to be installed via the provided makefile.
+
+ - `strainline/strainline` : A wrapper for the Strainline tool.
+
+
+## Visualization
 
 A collection of snakemake wrappers of Python APIs for visualization.
 
