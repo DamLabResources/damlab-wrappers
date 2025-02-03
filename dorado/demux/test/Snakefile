@@ -5,30 +5,30 @@ TEST_DATA_DIR = join(wd, '../../tests')
 
 rule all:
     input:
-        directory('test_bam'),
-        directory('test_fastq')
+        "test_bam/sample3.bam",
+        "test_bam/sample5.bam",
+        "test_bam/missing.bam",
+        "test_fastq/sample3.fastq",
+        "test_fastq/sample5.fastq",
+        "test_fastq/missing.fastq"
     conda: 'env.yaml'
     shell: "pytest tests.py"
 
-
-rule duplex_single:
-    input:
-        pod = join(TEST_DATA_DIR, 'filtered.pod5')
-    output:
-        temp('basecalled.bam')
-    threads: 1
-    resources:
-        gpu = 'all'
-    wrapper:
-        "file:../../duplex"
 
 rule test_demux_bam:
     input:
         reads = 'basecalled.bam'
     output:
-        temp(directory('test_bam'))
+        "test_bam/sample3.bam",
+        "test_bam/sample5.bam",
+        "test_bam/missing.bam"
     params:
         kit_name = "SQK-NBD114-24",
+        barcode_to_output = {
+            "barcode03": 0,  # maps to sample3.bam
+            "barcode05": 1,  # maps to sample5.bam
+            "barcode99": 2   # should create empty file
+        }
     threads: 2
     wrapper:
         "file:../" 
@@ -37,10 +37,17 @@ rule test_demux_fastq:
     input:
         reads = 'basecalled.bam'
     output:
-        temp(directory('test_fastq'))
+        "test_fastq/sample3.fastq",
+        "test_fastq/sample5.fastq",
+        "test_fastq/missing.fastq"
     params:
         kit_name = "SQK-NBD114-24",
-        emit_fastq = True
+        emit_fastq = True,
+        barcode_to_output = {
+            "barcode03": 0,  # maps to sample3.fastq
+            "barcode05": 1,  # maps to sample5.fastq
+            "barcode99": 2   # should create empty file
+        }
     threads: 2
     wrapper:
         "file:../" 
