@@ -1,0 +1,34 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test_clipped.fasta',
+        'test_clipped_no_ref.fasta'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_clipqs_with_ref:
+    input:
+        sequences = 'haplotypes.fasta',
+        reference = 'reference.fasta'
+    output:
+        'test_clipped.fasta'
+    params:
+        min_coverage = 0.2,
+        include_reference = True
+    wrapper:
+        "file:../"
+
+rule test_clipqs_no_ref:
+    input:
+        sequences = 'haplotypes.fasta',
+        reference = 'reference.fasta'
+    output:
+        'test_clipped_no_ref.fasta'
+    params:
+        min_coverage = 0.2,
+        include_reference = False
+    wrapper:
+        "file:../" 
