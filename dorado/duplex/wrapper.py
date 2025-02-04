@@ -33,9 +33,9 @@ if hasattr(snakemake.input, 'reference'):
     reference_arg = f"--reference {snakemake.input.reference}"
 
 # Handle GPU resources
-gpu_arg = "--device cpu"  # default to CPU
-if 'gpu' in snakemake.resources.keys():
-    gpu = snakemake.resources.get('gpu', 'all')
+gpu_arg = "--device cuda:all"  # default to all GPUs
+if 'gpu' in snakemake.params.keys():
+    gpu = snakemake.params.get('gpu', 'all')
     if gpu == 'all':
         gpu_arg = "--device cuda:all"  # could be made more specific if needed
     else: 

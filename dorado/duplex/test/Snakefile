@@ -18,7 +18,7 @@ rule test_duplex_single:
     log:
         temp('test.log')
     threads: 2
-    resources:
+    params:
         gpu = 'all'
     wrapper:
         "file:../"
@@ -31,7 +31,7 @@ rule test_duplex_directory:
     log:
         temp('test_dir.log')
     threads: 2
-    resources:
+    params:
         gpu = 'all'
     wrapper:
         "file:../"
