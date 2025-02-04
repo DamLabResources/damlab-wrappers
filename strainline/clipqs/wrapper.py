@@ -87,7 +87,7 @@ output_fasta = snakemake.output[0]
 min_coverage = snakemake.params.get("min_coverage", 0.2)
 include_reference = snakemake.params.get("include_reference", True)
 
-ref_name, ref_seq, _ = next(mp.fastx_read(ref_fasta, read_comment=False))
+ref_name, ref_seq, _, comment= next(mp.fastx_read(ref_fasta, read_comment=True))
 
 # Initialize aligner
 aligner = mp.Aligner(ref_fasta, preset="map-ont")
@@ -96,10 +96,10 @@ if not aligner:
 
 # Process sequences
 processed_records = []
-for name, seq, _ in mp.fastx_read(input_fasta, read_comment=False):
+for name, seq, _, comment in mp.fastx_read(input_fasta, read_comment=True):
     processed = process_sequence(
         aligner,
-        name,
+        name+' '+comment,
         seq,
         min_coverage=min_coverage
     )
