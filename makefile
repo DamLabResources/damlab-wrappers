@@ -7,6 +7,7 @@ make test:
 	make test_tool tool=strainline/clipqs profile=test
 	make test_tool tool=fasttree/FastTree profile=test
 	make test_tool tool=msa/muscle profile=test
+	make test_tool tool=fasttree/phytreeviz profile=test
 	
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile

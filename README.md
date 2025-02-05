@@ -34,7 +34,8 @@ This package requires the `strainline` tool to be installed via the provided mak
 This package contains wrappers for the Phylogenetic tree construction tools.
 
  - `fasttree/FastTree` : A wrapper for the Fasttree tool.
-
+ - `fasttree/phytreeviz` : A wrapper for the phytreeviz tool.
+ 
 ## Visualization
 
 A collection of snakemake wrappers of Python APIs for visualization.

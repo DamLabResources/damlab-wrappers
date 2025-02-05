@@ -1,0 +1,23 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test.png'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_phytreeviz:
+    input:
+        tree = 'test.newick'
+    output:
+        temp('test.png')
+    params:
+        format = "newick",
+        width = 8,
+        height = 8
+    log:
+        temp('test.log')
+    wrapper:
+        "file:../" 
