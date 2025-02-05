@@ -1,0 +1,20 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test.newick'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_fasttree:
+    input:
+        alignment = 'alignment.fasta'
+    output:
+        temp('test.newick')
+    log:
+        temp('test.log')
+    threads: 2
+    wrapper:
+        "file:../"

@@ -5,6 +5,7 @@ make test:
 	make test_tool tool=dorado/demux profile=test
 	make test_tool tool=strainline/strainline profile=test
 	make test_tool tool=strainline/clipqs profile=test
+	make test_tool tool=fasttree/FastTree profile=test
 	
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile
