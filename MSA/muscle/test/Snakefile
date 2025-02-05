@@ -1,0 +1,20 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test.fasta'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_muscle:
+    input:
+        sequences = 'sequences.fasta'
+    output:
+        temp('test.fasta')
+    log:
+        temp('test.log')
+    threads: 2
+    wrapper:
+        "file:../" 

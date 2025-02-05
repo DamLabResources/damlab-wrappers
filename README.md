@@ -15,6 +15,11 @@ This package contains wrappers for the Nanopore dorado tool.
  - `dorado/demux` : A wrapper for the Nanopore dorado demultiplexing tool.
  - more to come as needed...
 
+## Multiple sequence alignment
+
+This package contains wrappers for the multiple sequence alignment tools.
+
+ - `muscle/muscle` : A wrapper for the MUSCLE tool.
 
 ## Strainline
 
