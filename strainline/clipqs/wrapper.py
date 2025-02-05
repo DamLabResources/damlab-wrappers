@@ -66,12 +66,12 @@ def process_sequence(aligner, name: str, seq: str, min_coverage=0.2):
     if coverage < min_coverage:
         return None
     
-    # Orient sequence if needed
-    if strand == -1:
-        seq = mp.revcomp(seq)
-    
     # Clip unaligned ends
     clipped_seq = seq[start:end]
+
+    # Orient sequence if needed
+    if strand == -1:
+        clipped_seq = mp.revcomp(clipped_seq)
     
     # Create description with metrics
     description = f"coverage={coverage:.3f}"
@@ -97,9 +97,10 @@ if not aligner:
 # Process sequences
 processed_records = []
 for name, seq, _, comment in mp.fastx_read(input_fasta, read_comment=True):
+    header = (name+' '+comment) if comment else name
     processed = process_sequence(
         aligner,
-        name+' '+comment,
+        header,
         seq,
         min_coverage=min_coverage
     )
