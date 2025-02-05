@@ -2,5 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - muscle
+  # Pinned because YA has instruction failure on muscle>5.1
+  - muscle==5.1
   - python>=3.10 
