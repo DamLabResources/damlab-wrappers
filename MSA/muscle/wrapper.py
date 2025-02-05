@@ -18,10 +18,11 @@ output_aln = snakemake.output[0]
 
 # Get optional parameters
 extra = snakemake.params.get("extra", "")
+threads = snakemake.threads
 
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 # muscle -align input.fasta -output aligned.fasta
 shell(
-    "muscle -align {input_seqs} -output {output_aln} {extra} {log}"
+    "muscle -align {input_seqs} -output {output_aln} {extra} -threads {threads} {log}"
 ) 
