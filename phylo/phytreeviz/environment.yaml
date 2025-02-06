@@ -3,4 +3,4 @@ channels:
   - bioconda
 dependencies:
   - python>=3.10
-  - phytreeviz 
+  - phytreeviz=0.2
