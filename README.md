@@ -35,6 +35,7 @@ This package contains wrappers for the Phylogenetic tree construction tools.
 
  - `phylo/FastTree` : A wrapper for the Fasttree tool.
  - `phylo/phytreeviz` : A wrapper for the phytreeviz tool.
+ - `phylo/reroot` : A wrapper to reroot a tree using dendropy.
  
 ## Visualization
 

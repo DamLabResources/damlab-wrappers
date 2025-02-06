@@ -8,6 +8,7 @@ make test:
 	make test_tool tool=phylo/FastTree profile=test
 	make test_tool tool=msa/muscle profile=test
 	make test_tool tool=phylo/phytreeviz profile=test
+	make test_tool tool=phylo/reroot profile=test
 	
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile

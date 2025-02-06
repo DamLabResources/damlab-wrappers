@@ -1,0 +1,19 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'test_rerooted.newick'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_reroot:
+    input:
+        tree = 'test.newick'
+    output:
+        temp('test_rerooted.newick')
+    params:
+        root_taxon = "Seq1"
+    wrapper:
+        "file:../" 
