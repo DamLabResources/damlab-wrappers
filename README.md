@@ -51,6 +51,14 @@ This package contains wrappers for the Nanopore dorado tool.
  - [`dorado/demux`](dorado/demux/README.md) : Nanopore dorado demultiplexing tool. Supports various barcoding kits and custom barcode arrangements.
  - more to come as needed...
 
+## POD5
+
+This package contains wrappers for the POD5 file format.
+
+ - [`pod5/convert_fast5`](pod5/convert_fast5/README.md) : Convert Oxford Nanopore FAST5 files to the newer POD5 format.
+ - more to come as needed...
+
+
 ## Multiple sequence alignment
 
 This package contains wrappers for the multiple sequence alignment tools.

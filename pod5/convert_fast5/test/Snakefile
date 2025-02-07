@@ -1,0 +1,28 @@
+from pathlib import Path
+
+rule all:
+    input:
+        'test_single.pod5',
+        'test_dir.pod5'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_convert_fast5_single:
+    input:
+        fast5_files=['test.fast5']
+    output:
+        temp('test_single.pod5')
+    #log:
+    #    temp('test.log')
+    wrapper:
+        "file:../" 
+
+rule test_convert_fast5_dir:
+    input:
+        fast5_dir='../'
+    output:
+        temp('test_dir.pod5')
+    #log:
+    #    temp('test.log')
+    wrapper:
+        "file:../" 
