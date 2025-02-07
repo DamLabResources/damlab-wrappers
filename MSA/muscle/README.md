@@ -1,4 +1,4 @@
-# Wrapper for MUSCLE
+# MUSCLE
 
 [MUSCLE](https://drive5.com/muscle/) is a program for creating multiple sequence alignments of amino acid or nucleotide sequences.
 

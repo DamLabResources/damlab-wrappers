@@ -1,6 +1,7 @@
-# Dorado Duplex Wrapper
+# Dorado Duplex
 
 Wrapper for the ONT dorado duplex basecalling tool.
+This tool performs basecalling on both strands of a duplex read.
 
 ## Inputs
 * `pod`: Path to POD5 file or directory (required)

@@ -1,4 +1,4 @@
-# Wrapper for FastTree
+# FastTree
 
 [FastTree](http://www.microbesonline.org/fasttree/) infers approximately-maximum-likelihood phylogenetic trees from alignments of nucleotide or protein sequences.
 

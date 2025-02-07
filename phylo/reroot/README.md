@@ -1,4 +1,4 @@
-# Wrapper for Tree Rerooting
+# Tree Rerooting
 
 A wrapper that uses [DendroPy](https://dendropy.org/) to reroot phylogenetic trees at a specified taxon.
 

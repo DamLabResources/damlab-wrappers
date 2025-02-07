@@ -1,4 +1,4 @@
-# Wrapper for phytreeviz
+# Phytreeviz
 
 [phytreeviz](https://github.com/damlab/phytreeviz) is a tool for visualizing phylogenetic trees.
 

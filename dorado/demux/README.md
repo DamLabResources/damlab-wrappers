@@ -1,6 +1,7 @@
-# Dorado Demultiplexing Wrapper
+# Dorado Demultiplexing
 
 Wrapper for the ONT dorado demultiplexing tool.
+This tool splits reads into separate files based on the barcode sequence.
 
 ## Inputs
 * `reads`: Path to input reads file or directory (required)

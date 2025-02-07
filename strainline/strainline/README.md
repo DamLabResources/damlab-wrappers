@@ -1,4 +1,4 @@
-# Wrapper for Strainline
+# Strainline
 
 [Strainline](https://github.com/HaploKit/Strainline) is a tool for strain-aware long-read haplotype phasing.
 

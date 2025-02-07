@@ -1,6 +1,7 @@
-# Wrapper for clipqs
+# ClipQS
 
-A wrapper for clipping and orienting sequences using minimap2. This tool aligns sequences to a reference, clips unaligned regions, and ensures proper orientation.
+A wrapper for clipping and orienting sequences using minimap2.
+This tool aligns sequences to a reference, clips unaligned regions, and ensures proper orientation.
 
 ## Input
 * `sequences`
