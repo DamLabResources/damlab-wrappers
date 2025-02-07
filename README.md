@@ -7,6 +7,42 @@ A collection of snakemake wrappers that are not suitable for the wider snakemake
 A description of the different toolset groups.
 
 
+## Usage
+
+The wrappers are designed to be used in the snakemake workflow.
+They can be used from the Github repo directly.
+
+```python
+rule dorado_duplex:
+    input:
+        "data/reads.fastq.gz"
+    output:
+        "data/reads.duplex.fastq.gz"
+    wrapper:
+        "https://github.com/damlab/damlab-wrappers/blob/main/dorado/duplex"
+```
+
+For certain tools, you may need to install the tool environment separately.
+
+```bash
+git clone https://github.com/damlab/damlab-wrappers.git
+cd damlab-wrappers
+make install
+```
+
+```python
+rule strainline_haplotypes:
+    input:
+        "data/reads.fastq.gz"
+    output:
+        "data/haplotypes.fasta"
+    params:
+        prefix = f"{wrappers_path}/strainline/venv"
+    wrapper:
+        f"file://{wrappers_path}/strainline/strainline"
+```
+
+
 ## Dorado basecalling
 
 This package contains wrappers for the Nanopore dorado tool.

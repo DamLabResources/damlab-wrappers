@@ -23,3 +23,10 @@ clean:
 very_clean:
 	make clean
 	find . -type d -name "venv" -exec rm -rf {} +
+
+venv:
+	mamba env create -f environment.yml --prefix venv
+
+strainline/venv:
+	cd strainline
+	make venv
