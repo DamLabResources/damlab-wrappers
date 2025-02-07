@@ -1,0 +1,27 @@
+from pathlib import Path
+
+rule all:
+    input:
+        'test_single_split',
+        'test_dir_split',
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_split_single:
+    input:
+        pod5_files=['test_single.pod5']
+    output:
+        temp(directory('test_single_split'))
+    log:
+        temp('test.log')
+    wrapper:
+        "file:../"
+
+
+rule test_split_dir:
+    input:
+        pod5_dir='../'
+    output:
+        temp(directory('test_dir_split'))
+    wrapper:
+        "file:../" 

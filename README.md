@@ -56,7 +56,7 @@ This package contains wrappers for the Nanopore dorado tool.
 This package contains wrappers for the POD5 file format.
 
  - [`pod5/convert_fast5`](pod5/convert_fast5/README.md) : Convert Oxford Nanopore FAST5 files to the newer POD5 format.
- - more to come as needed...
+ - [`pod5/split_by_channel`](pod5/split_by_channel/README.md) : Split POD5 files by channel.
 
 
 ## Multiple sequence alignment

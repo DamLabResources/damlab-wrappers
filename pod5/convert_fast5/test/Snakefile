@@ -12,8 +12,8 @@ rule test_convert_fast5_single:
         fast5_files=['test.fast5']
     output:
         temp('test_single.pod5')
-    #log:
-    #    temp('test.log')
+    log:
+        temp('test.log')
     wrapper:
         "file:../" 
 
@@ -22,7 +22,7 @@ rule test_convert_fast5_dir:
         fast5_dir='../'
     output:
         temp('test_dir.pod5')
-    #log:
-    #    temp('test.log')
+    log:
+        temp('test.log')
     wrapper:
         "file:../" 
