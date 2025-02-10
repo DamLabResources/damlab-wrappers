@@ -2,6 +2,7 @@ make test:
 	make test_tool tool=visualization/jaspar2logo profile=test
 	make test_tool tool=CRISPR/ICE profile=test
 	make test_tool tool=dorado/duplex profile=test
+	make test_tool tool=dorado/simplex profile=test
 	make test_tool tool=dorado/demux profile=test
 	make test_tool tool=strainline/strainline profile=test
 	make test_tool tool=strainline/clipqs profile=test
@@ -11,7 +12,7 @@ make test:
 	make test_tool tool=phylo/reroot profile=test
 	make test_tool tool=pod5/convert_fast5 profile=test
 	make test_tool tool=pod5/split_by_channel profile=test
-	
+
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile
 

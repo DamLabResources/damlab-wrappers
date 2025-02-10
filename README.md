@@ -2,10 +2,6 @@
 
 A collection of snakemake wrappers that are not suitable for the wider snakemake-wrappers config.
 
-## Uses
-
-A description of the different toolset groups.
-
 
 ## Usage
 
@@ -48,6 +44,7 @@ rule strainline_haplotypes:
 This package contains wrappers for the Nanopore dorado tool.
 
  - [`dorado/duplex`](dorado/duplex/README.md) : Nanopore dorado duplex basecalling tool. Supports GPU acceleration and optional reference-based alignment.
+ - [`dorado/simplex`](dorado/simplex/README.md) : Nanopore dorado simplex basecalling tool. Supports GPU acceleration and optional reference-based alignment.
  - [`dorado/demux`](dorado/demux/README.md) : Nanopore dorado demultiplexing tool. Supports various barcoding kits and custom barcode arrangements.
  - more to come as needed...
 
