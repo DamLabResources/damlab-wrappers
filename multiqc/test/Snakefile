@@ -1,0 +1,22 @@
+
+
+SAMPLES = ["sample1", "sample2", "sample3"]
+print(SAMPLES)
+
+rule multiqc:
+    input:
+        expand("build/strainline/{sample}_mqc.yaml", sample=SAMPLES),
+    output:
+        report = "build/multiqc/multiqc_report.html"
+    params:
+        prefix = "../venv"
+    wrapper:
+        "file:../multiqc"
+
+rule strainline_mqc:
+    input:
+        "strainline/{sample}/haplotypes.final.fa",
+    output:
+        "build/strainline/{sample}_mqc.yaml"
+    wrapper:
+        "file:../strainline"

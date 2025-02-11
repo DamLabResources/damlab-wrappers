@@ -26,9 +26,6 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 # Set up path to include the prefix bin directory
 path_cmd = f"export PATH={prefix}/bin:$PATH && "
 
-# Install the DAMlab plugin into the environment
-install_cmd = f"pip install --prefix {prefix} multiqc_damlab && "
-
 # Create MultiQC command
 cmd = "multiqc"
 
@@ -52,4 +49,4 @@ if config:
 cmd += f" {log}"
 
 # Run commands
-shell(path_cmd + install_cmd + cmd) 
+shell(path_cmd + cmd) 

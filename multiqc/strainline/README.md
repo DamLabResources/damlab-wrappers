@@ -1,29 +1,28 @@
 # Strainline MultiQC Log Generator
 
-Wrapper for generating MultiQC-compatible log files from Strainline output directories.
+Wrapper for generating MultiQC-compatible log files from Strainline haplotype files.
 
 ## Input
-* Strainline output directory containing:
-  - `filter_by_abun/haplotypes.final.fa`
-  - Clustering output files
-  - Quality filtering logs
+* `haplotypes.final.fa` file from Strainline output
+  - Expected to be in a path like `sample_name/filter_by_abun/haplotypes.final.fa`
+  - Sample name is extracted from the parent directory name
 
 ## Output
 * YAML format log file containing:
-  - Haplotype statistics (count, N50, total bases)
-  - Clustering statistics
-  - Quality metrics
+  - Haplotype count
+  - Haplotype length statistics (min/max/mean)
+  - Haplotype frequency statistics (min/max/mean)
 
 ## Example
 
 ```python
 rule strainline_multiqc_log:
     input:
-        "strainline_output"  # Directory containing Strainline results
+        "results/{sample}/filter_by_abun/haplotypes.final.fa"
     output:
-        "strainline_multiqc.yaml"  # MultiQC-compatible log file
+        "qc/{sample}.strainline.yaml"  # MultiQC-compatible log file
     log:
-        "logs/strainline_multiqc.log"
+        "logs/strainline_multiqc/{sample}.log"
     wrapper:
         "file:path/to/damlab-wrappers/strainline/multiqc"
 ```
@@ -33,5 +32,5 @@ rule strainline_multiqc_log:
 
 ## Notes
 - This wrapper generates a standardized log file that can be parsed by the DAMlab MultiQC plugin
-- The log format is designed to capture key metrics from Strainline runs
-- Future versions will expand the metrics collected based on MultiQC visualization needs 
+- The log format is designed to capture key metrics from Strainline haplotype reconstruction
+- Sample name is extracted from the directory structure (two levels up from the haplotypes file) 

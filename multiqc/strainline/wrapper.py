@@ -12,10 +12,10 @@ if "snakemake" not in locals():
     #  Keeps linters happy but doesn't impact funtion
     import snakemake # type: ignore
 
-# Get input directory
-input_dir = snakemake.input[0]
-if not os.path.isdir(input_dir):
-    raise ValueError("Input must be a Strainline output directory")
+# Get input file
+haplotypes_file = snakemake.input[0]
+if not os.path.exists(haplotypes_file):
+    raise ValueError("Input must be a haplotypes.final.fa file")
 
 # Get output log file
 output_log = snakemake.output[0]
@@ -23,19 +23,15 @@ output_log = snakemake.output[0]
 
 def parse_haplotype_description(description):
     """Parse haplotype description string into dictionary."""
-    # 7973550x freq=1.000
-    _, freq_str = description.split(' ')
+    #hap1 7973550x freq=1.000
+    _, _, freq_str = description.split(' ')
     freq = float(freq_str.split('=')[1])
     return {
         'haplotype_freq': freq
     }
 
-def get_haplotype_stats(directory):
-    """Get haplotype statistics from Strainline output directory."""
-    haplotypes_file = os.path.join(directory, 'haplotypes.final.fa')
-    if not os.path.exists(haplotypes_file):
-        raise ValueError("Haplotypes file not found in Strainline output directory")
-    
+def get_haplotype_stats(haplotypes_file):
+    """Get haplotype statistics from Strainline haplotypes file."""
     # Read haplotypes file
     with open(haplotypes_file, 'r') as f:
         for seqR in SeqIO.parse(f, 'fasta'):
@@ -44,26 +40,26 @@ def get_haplotype_stats(directory):
             info.update(parse_haplotype_description(seqR.description))
             info['haplotype_length'] = len(seqR.seq)
             yield info
-    
 
 
-def parse_strainline_dir(directory):
-    """Parse Strainline output directory for relevant metrics."""
+def parse_strainline_haplotypes(haplotypes_file):
+    """Parse Strainline haplotypes file for relevant metrics."""
+    # Get sample name from parent directory name
+    sample_id = os.path.basename(os.path.dirname(os.path.dirname(haplotypes_file)))
 
-    haplotype_stats = pd.DataFrame(list(get_haplotype_stats(directory)))
+    haplotype_stats = pd.DataFrame(list(get_haplotype_stats(haplotypes_file)))
 
     metrics = {
-        'sample_id': os.path.basename(directory),
+        'sample_id': sample_id,
         'haplotype_count': len(haplotype_stats.index),
-        'haplotype_max_length': haplotype_stats['haplotype_length'].max(),
-        'haplotype_min_length': haplotype_stats['haplotype_length'].min(),
-        'haplotype_mean_length': haplotype_stats['haplotype_length'].mean(),
+        'haplotype_max_length': int(haplotype_stats['haplotype_length'].max()),
+        'haplotype_min_length': int(haplotype_stats['haplotype_length'].min()),
+        'haplotype_mean_length': int(haplotype_stats['haplotype_length'].mean()),
         
-        'haplotype_max_freq': haplotype_stats['haplotype_freq'].max(),
-        'haplotype_min_freq': haplotype_stats['haplotype_freq'].min(),
-        'haplotype_mean_freq': haplotype_stats['haplotype_freq'].mean(),
+        'haplotype_max_freq': float(haplotype_stats['haplotype_freq'].max()),
+        'haplotype_min_freq': float(haplotype_stats['haplotype_freq'].min()),
+        'haplotype_mean_freq': float(haplotype_stats['haplotype_freq'].mean()),
     }
-    
     
     return metrics
 
@@ -73,8 +69,8 @@ def write_multiqc_log(metrics, output_file):
         handle.write(f"# Strainline MultiQC Log\n")
         yaml.dump(metrics, handle, default_flow_style=False)
 
-# Parse the directory
-metrics = parse_strainline_dir(input_dir)
+# Parse the haplotypes file
+metrics = parse_strainline_haplotypes(haplotypes_file)
 
 # Write the log file
 write_multiqc_log(metrics, output_log) 
