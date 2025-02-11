@@ -5,11 +5,12 @@ print(SAMPLES)
 
 rule multiqc:
     input:
-        expand("build/strainline/{sample}_mqc.yaml", sample=SAMPLES),
+        expand("build/strainline/{sample}.strainline.yaml", sample=SAMPLES),
     output:
         report = "build/multiqc/multiqc_report.html"
     params:
-        prefix = "../venv"
+        prefix = "../venv",
+        extra_args = "-v"
     wrapper:
         "file:../multiqc"
 
@@ -17,6 +18,6 @@ rule strainline_mqc:
     input:
         "strainline/{sample}/haplotypes.final.fa",
     output:
-        "build/strainline/{sample}_mqc.yaml"
+        "build/strainline/{sample}.strainline.yaml"
     wrapper:
         "file:../strainline"

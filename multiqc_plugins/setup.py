@@ -9,16 +9,17 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'multiqc>=1.14',
+        'multiqc>=1.27',
         'click>=7.0'
     ],
     entry_points={
         'multiqc.modules.v1': [
-            'dorado = damlabqc.modules.dorado:DoradoModule',
-            'strainline = damlabqc.modules.strainline:StrainlineModule',
+            'dorado = damlabqc.modules.dorado:MultiqcModule',
+            'strainline = damlabqc.modules.strainline:MultiqcModule',
         ],
         'multiqc.cli_options.v1': [
             'debug_option = damlabqc.cli:debug_option'
         ],
+        "multiqc.hooks.v1": ["execution_start = damlabqc.hook:add_config"],
     },
 ) 

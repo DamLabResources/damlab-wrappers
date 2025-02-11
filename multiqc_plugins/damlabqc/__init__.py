@@ -1,8 +1,8 @@
 """MultiQC plugin for DAMlab wrappers."""
 
 try:
-    from .modules.dorado import DoradoModule
-    from .modules.strainline import StrainlineModule
+    from .modules.dorado.dorado import DoradoModule
+    from .modules.strainline.strainline import StrainlineModule
 except ImportError as e:
     # Handle import errors more gracefully
     import logging

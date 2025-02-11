@@ -19,6 +19,7 @@ if not prefix:
 # Get optional parameters
 config = snakemake.params.get("config", "")
 template = snakemake.params.get("template", "default")
+extra_args = snakemake.params.get("extra_args", "")
 
 # Handle logging
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
@@ -44,6 +45,10 @@ if template != "default":
 # Add config if specified
 if config:
     cmd += f" -c {config}"
+
+# Add extra args if specified
+if extra_args:
+    cmd += f" {extra_args}"
 
 # Add logging
 cmd += f" {log}"

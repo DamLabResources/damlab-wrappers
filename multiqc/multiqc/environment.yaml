@@ -2,8 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python>=3.7
-  - pip
-  - multiqc>=1.14
-  - setuptools
-  - wheel 
+  - python>=3.10
