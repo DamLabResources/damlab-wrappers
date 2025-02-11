@@ -12,5 +12,3 @@ def add_config():
     if "strainline" not in config.sp:
         config.update_dict(config.sp, {"strainline": {"fn": "*.strainline.yaml"}})
     
-    # Add to the module order
-    config.module_order = ["strainline"] + config.module_order

@@ -14,8 +14,6 @@ log.critical(f"Got log somehow")
 class MultiqcModule(BaseMultiqcModule):
     def __init__(self):
 
-        
-
         super(MultiqcModule, self).__init__(
             name='Strainline',
             anchor='strainline',
