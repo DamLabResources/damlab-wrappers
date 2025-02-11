@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='multiqc_damlab',
+    name='damlabqc',
     version='0.1.0',
     author='DAMlab',
     author_email='your.email@example.com',
@@ -14,11 +14,11 @@ setup(
     ],
     entry_points={
         'multiqc.modules.v1': [
-            'dorado = multiqc_damlab.modules.dorado:DoradoModule',
-            'strainline = multiqc_damlab.modules.strainline:StrainlineModule',
+            'dorado = damlabqc.modules.dorado:DoradoModule',
+            'strainline = damlabqc.modules.strainline:StrainlineModule',
         ],
         'multiqc.cli_options.v1': [
-            'debug_option = multiqc_damlab.cli:debug_option'
+            'debug_option = damlabqc.cli:debug_option'
         ],
     },
 ) 
