@@ -1,16 +1,26 @@
 
 
 SAMPLES = ["sample1", "sample2", "sample3"]
-print(SAMPLES)
+
+
+rule all:
+    input:
+        "build/multiqc/multiqc_report.html",
+        "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
+    conda: "env.yaml"
+    shell:
+        "pytest tests.py"
+
 
 rule multiqc:
     input:
         expand("build/strainline/{sample}.strainline.yaml", sample=SAMPLES),
     output:
-        report = "build/multiqc/multiqc_report.html"
+        report = "build/multiqc/multiqc_report.html",
+        data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
     params:
         prefix = "../venv",
-        extra_args = "-v"
+        extra_args = "-v -f"
     wrapper:
         "file:../multiqc"
 
@@ -19,5 +29,7 @@ rule strainline_mqc:
         "strainline/{sample}/haplotypes.final.fa",
     output:
         "build/strainline/{sample}.strainline.yaml"
+    params:
+        sample_name = lambda wildcards: wildcards.sample
     wrapper:
         "file:../strainline"

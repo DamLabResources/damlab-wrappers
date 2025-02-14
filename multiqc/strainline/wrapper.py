@@ -42,15 +42,16 @@ def get_haplotype_stats(haplotypes_file):
             yield info
 
 
-def parse_strainline_haplotypes(haplotypes_file):
+def parse_strainline_haplotypes(haplotypes_file, sample_name=None):
     """Parse Strainline haplotypes file for relevant metrics."""
     # Get sample name from parent directory name
-    sample_id = os.path.basename(os.path.dirname(os.path.dirname(haplotypes_file)))
+    if sample_name is None:
+        sample_name = os.path.basename(os.path.dirname(os.path.dirname(haplotypes_file)))
 
     haplotype_stats = pd.DataFrame(list(get_haplotype_stats(haplotypes_file)))
 
     metrics = {
-        'sample_id': sample_id,
+        'sample_name': sample_name,
         'haplotype_count': len(haplotype_stats.index),
         'haplotype_max_length': int(haplotype_stats['haplotype_length'].max()),
         'haplotype_min_length': int(haplotype_stats['haplotype_length'].min()),
@@ -70,7 +71,7 @@ def write_multiqc_log(metrics, output_file):
         yaml.dump(metrics, handle, default_flow_style=False)
 
 # Parse the haplotypes file
-metrics = parse_strainline_haplotypes(haplotypes_file)
+metrics = parse_strainline_haplotypes(haplotypes_file, sample_name=snakemake.params.get('sample_name'))
 
 # Write the log file
 write_multiqc_log(metrics, output_log) 
