@@ -1,0 +1,10 @@
+@HD	VN:1.6	SO:unknown
+@SQ	SN:test_ref	LN:1000
+@PG	ID:dorado	PN:dorado	VN:1.0.0
+read1	4	test_ref	1	60	15M	*	0	0	ACGTACGTACGTACG	!!!!!!!!!!!!!!!	dx:i:1	qm:f:21.3
+read2	0	test_ref	1	60	11M	*	0	0	ACGTACGTACG	!!!!!!!!!!!	dx:i:0	qm:f:13.5
+read3	0	test_ref	1	60	13M	*	0	0	ACGTACGTACGTA	!!!!!!!!!!!!!	dx:i:-1	qm:f:15.9
+read4	4	test_ref	1	60	10M	*	0	0	ACGTACGTAC	!!!!!!!!!!	qm:f:12.2
+read5	0	test_ref	1	60	14M	*	0	0	ACGTACGTACGTAC	!!!!!!!!!!!!!!	dx:i:1	qm:f:19.8
+read6	4	test_ref	1	60	12M	*	0	0	ACGTACGTACGT	!!!!!!!!!!!!	dx:i:-1	qm:f:14.4
+read7	0	test_ref	1	60	11M	*	0	0	ACGTACGTACG	!!!!!!!!!!!	dx:i:1	qm:f:18.6 

@@ -4,12 +4,11 @@ import os
 import sys
 
 from multiqc import config
-from multiqc.base_module import BaseMultiqcModule # type: ignore
-from multiqc.plots import linegraph, bargraph # type: ignore
-from multiqc.plots.table_object import ColumnMeta # type: ignore
-from multiqc.base_module import ModuleNoSamplesFound # type: ignore
+from multiqc.base_module import BaseMultiqcModule
+from multiqc.plots import linegraph, bargraph
+from multiqc.base_module import ModuleNoSamplesFound
 
-import yaml # type: ignore
+import yaml
 
 log = logging.getLogger('damlabqc.strainline')
 

@@ -1,11 +1,11 @@
 """Wrapper for MultiQC with DAMlab plugins"""
 
-from snakemake.shell import shell # type: ignore
+from snakemake.shell import shell
 import os
 
 if "snakemake" not in locals():
     #  Keeps linters happy but doesn't impact funtion
-    import snakemake # type: ignore
+    import snakemake
 
 # Get input and output files
 input_files = snakemake.input

@@ -1,9 +1,5 @@
 from multiqc import config # type: ignore
 
-import logging
-log = logging.getLogger('multiqc.modules.strainline')
-log.critical('Importing hook')
-
 
 def add_config():
     """Code to execute after the config files and
@@ -14,8 +10,9 @@ def add_config():
 
     # Add to the search patterns used by modules
     if "strainline" not in config.sp:
-        config.update_dict(config.sp, {"strainline": {"fn": "*.strainline.*",
-                                                      "contents": "# Strainline MultiQC Log",
-                                                      "num_lines": 10000}})
-        log.critical('updated in damlabqc hook {}'.format(config.sp['strainline']))
-        log.critical('Other SP example {}'.format(config.sp['afterqc']))
+        config.update_dict(config.sp, {"strainline": {"contents": "# Strainline MultiQC Log",
+                                                      "num_lines": 10}})
+
+    if "dorado" not in config.sp:
+        config.update_dict(config.sp, {"dorado": {"contents": "# Dorado MultiQC Log",
+                                                  "num_lines": 10}})
