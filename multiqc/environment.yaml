@@ -2,8 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python>=3.10
+  - python=3.12
   - pip
-  - multiqc
   - pip:
-    - ../multiqc_plugins/
+    - -e ../multiqc_plugins/

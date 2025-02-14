@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "damlabqc"
+version = "0.1.0"
+authors = [
+    {name = "DAMlab", email = "wnd22@drexel.edu"},
+]
+description = "MultiQC plugin for DAMlab wrappers"
+requires-python = ">=3.7"
+dependencies = [
+    "multiqc>=1.27",
+    "click>=7.0",
+]
+
+[tool.setuptools]
+packages = ["damlabqc"]
+include-package-data = true
+
+[project.entry-points."multiqc.modules.v1"]
+strainline = "damlabqc.modules.strainline:MultiqcModule"
+
+[project.entry-points."multiqc.cli_options.v1"]
+debug_option = "damlabqc.cli:debug_option"
+
+
+[project.entry-points."multiqc.hooks.v1"]
+execution_start = "damlabqc.hook:add_config" 

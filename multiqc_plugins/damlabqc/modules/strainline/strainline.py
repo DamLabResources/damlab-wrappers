@@ -1,15 +1,18 @@
+import logging
+
+log = logging.getLogger('multiqc.modules.strainline')
+log.critical('Properly imported!')
+
 from multiqc import config
-from multiqc.modules.base_module import BaseMultiqcModule # type: ignore
+from multiqc.base_module import BaseMultiqcModule # type: ignore
 from multiqc.plots import linegraph, bargraph # type: ignore
 from multiqc.plots.table_object import ColumnMeta # type: ignore
-import logging
+
 import os
 import yaml # type: ignore
 from collections import OrderedDict
 import sys
 
-log = logging.getLogger('multiqc.modules.strainline')
-log.critical(f"Got log somehow")
 
 class MultiqcModule(BaseMultiqcModule):
     def __init__(self):
@@ -24,6 +27,7 @@ class MultiqcModule(BaseMultiqcModule):
         # Add to module config
         headers = {
             'haplotype_count': ColumnMeta(
+                rid='1', 
                 title='Haplotype Count',
                 description='Number of haplotypes reconstructed',
                 scale='RdYlGn',
@@ -31,6 +35,7 @@ class MultiqcModule(BaseMultiqcModule):
                 placement=900.0  # Place towards left side of table
             ),
             'haplotype_freqs_max': ColumnMeta(
+                rid='2',
                 title='Max Frequency',
                 description='Maximum frequency of any haplotype',
                 scale='RdYlGn',
@@ -41,8 +46,8 @@ class MultiqcModule(BaseMultiqcModule):
             )
         }
         
-        config.module_order = ["strainline"] + config.module_order
-        config.general_stats_headers['strainline'] = headers
+        #config.module_order = ["strainline"] + config.module_order
+        #config.general_stats_headers['strainline'] = headers
 
         # Find all strainline output files
         self.strainline_data = dict()
@@ -73,10 +78,15 @@ class MultiqcModule(BaseMultiqcModule):
                 'haplotype_count': metrics['haplotype_count'],
                 'haplotype_freqs_max': metrics['haplotype_freqs']['max']
             }
-        self.general_stats_addcols(general_stats_data, headers)
+        
+        # TODO: Add headers to general stats table
+        #self.general_stats_addcols(general_stats_data, headers)
+
+        # Adding without headers for now
+        self.general_stats_addcols(general_stats_data) #headers
         
         # Add sections to report
-        self.add_sections()
+        #self.add_sections()
         
     def parse_strainline_logs(self, f):
         """Parse strainline log files."""
@@ -115,6 +125,9 @@ class MultiqcModule(BaseMultiqcModule):
     def add_sections(self):
         """Add sections to MultiQC report."""
         # Add haplotype count barplot
+
+        # TODO: Add haplotype count barplot correctly
+
         self.add_section(
             name='Haplotype Counts',
             anchor='strainline-haplotype-counts',

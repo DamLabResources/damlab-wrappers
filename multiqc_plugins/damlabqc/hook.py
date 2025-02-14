@@ -1,4 +1,8 @@
-from multiqc.utils import config # type: ignore
+from multiqc import config # type: ignore
+
+import logging
+log = logging.getLogger('multiqc.modules.strainline')
+log.critical('Importing hook')
 
 
 def add_config():
@@ -10,5 +14,8 @@ def add_config():
 
     # Add to the search patterns used by modules
     if "strainline" not in config.sp:
-        config.update_dict(config.sp, {"strainline": {"fn": "*.strainline.yaml"}})
-    
+        config.update_dict(config.sp, {"strainline": {"fn": "*.strainline.*",
+                                                      "contents": "# Strainline MultiQC Log",
+                                                      "num_lines": 10000}})
+        log.critical('updated in damlabqc hook {}'.format(config.sp['strainline']))
+        log.critical('Other SP example {}'.format(config.sp['afterqc']))
