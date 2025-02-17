@@ -1,4 +1,4 @@
-from multiqc import config # type: ignore
+from multiqc import config
 
 
 def add_config():
@@ -15,4 +15,8 @@ def add_config():
 
     if "dorado" not in config.sp:
         config.update_dict(config.sp, {"dorado": {"contents": "# Dorado MultiQC Log",
+                                                  "num_lines": 10}})
+        
+    if "hivmetrics" not in config.sp:
+        config.update_dict(config.sp, {"hivmetrics": {"contents": "# HIV Metrics MultiQC Log",
                                                   "num_lines": 10}})
