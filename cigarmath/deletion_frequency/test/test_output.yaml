@@ -1,0 +1,5 @@
+deletion_frequency: 0.43333333333333335
+reads_covering_required: 30
+reads_with_deletion: 13
+sample_name: test
+total_reads: 180

@@ -1,0 +1,28 @@
+rule all:
+    input:
+        'test_output.yaml'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_deletion_frequency:
+    input:
+        'test.bam'
+    output:
+        'test_output.yaml'
+    params:
+        required_region = "HXB2F:1000-7000",
+        deletion_region = "HXB2F:2100-2150",
+        sample_name = 'test'
+    wrapper:
+        "file:../"
+
+
+rule:
+    input:
+        '../../test_data/test.sam'
+    output:
+        temp('test.bam')
+    params:
+        extra = '-n'
+    wrapper:
+        "v5.8.2/bio/samtools/sort"
