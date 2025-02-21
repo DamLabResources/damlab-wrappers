@@ -15,6 +15,8 @@ rule multiqc:
         expand("build/strainline/{sample}.strainline.yaml", sample=SAMPLES),
         expand("build/dorado/{sample}.dorado.yaml", sample=SAMPLES),
         expand("build/hivmetrics/{sample}.hivmetrics.yaml", sample=SAMPLES),
+        expand("build/deletion_frequency/{sample}.p24.deletion_frequency.yaml", sample=SAMPLES),
+        expand("build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml", sample=SAMPLES),
     output:
         report = "build/multiqc/multiqc_report.html",
         data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
@@ -47,13 +49,65 @@ rule dorado_mqc:
 
 rule hivmetrics_mqc:
     input:
-        "hivmetrics/{sample}.bam"
+        "build/hivreads/{sample}.sam"
     output:
         "build/hivmetrics/{sample}.hivmetrics.yaml"
     params:
         sample_name = lambda wildcards: wildcards.sample
     wrapper:
         "file:../hivmetrics"
+
+def sample2seed(sample):
+    return int(sample[-1])
+
+rule:
+    input:
+        "../../cigarmath/test_data/test.sam"
+    params:
+        # Downsample to a random 80% of the reads
+        extra = lambda wildcards: f'-s {sample2seed(wildcards.sample)}.8 -h' 
+    output:
+        temp("build/hivreads/{sample}.sam")
+    wrapper:
+        "v5.8.0/bio/samtools/view"
+
+rule:
+    input:
+        "build/hivreads/{sample}.sam"
+    params:
+        # Sort by name
+        extra = '-n'
+    output:
+        temp("build/deletion_frequency/{sample}.bam")
+    wrapper:
+        "v5.8.0/bio/samtools/sort"
+
+
+rule deletion_frequency_A_mqc:
+    input:
+        "build/deletion_frequency/{sample}.bam"
+    output:
+        "build/deletion_frequency/{sample}.p24.deletion_frequency.yaml"
+    params:
+        required_region = "HXB2F:1000-7000",
+        deletion_region = "HXB2F:1186-1879",
+        sample_name = lambda wildcards: wildcards.sample,
+        region_name = "p24"
+    wrapper:
+        "file:../../cigarmath/deletion_frequency"
+
+rule deletion_frequency_B_mqc:
+    input:
+        "build/deletion_frequency/{sample}.bam"
+    output:
+        "build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml"
+    params:
+        required_region = "HXB2F:1000-7000",
+        deletion_region = "HXB2F:6262-6310",
+        sample_name = lambda wildcards: wildcards.sample,
+        region_name = "vpr"
+    wrapper:
+        "file:../../cigarmath/deletion_frequency"
 
 rule convert_to_bam:
     input:

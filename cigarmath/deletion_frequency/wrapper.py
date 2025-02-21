@@ -19,6 +19,7 @@ output_yaml = snakemake.output[0]
 # Get required parameters
 required_region = snakemake.params.get("required_region")
 deletion_region = snakemake.params.get("deletion_region")
+region_name = snakemake.params.get("region_name", "region")
 sample_name = snakemake.params.get("sample_name", "sample")
 
 # Validate parameters
@@ -41,6 +42,7 @@ combined_segment_stream = cm.io.combined_segment_stream(fixed_segment_stream)
 
 stats = {
     "sample_name": sample_name,
+    "region_name": region_name,
     "total_reads": 0,
     "reads_covering_required": 0,
     "reads_with_deletion": 0,
@@ -66,4 +68,5 @@ stats["deletion_frequency"] = stats["reads_with_deletion"] / stats["reads_coveri
 
 # Write output
 with open(output_yaml, 'w') as f:
+    f.write('# Cigarmath Deletion Frequency\n')
     yaml.dump(stats, f) 

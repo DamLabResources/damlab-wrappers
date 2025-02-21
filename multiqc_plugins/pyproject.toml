@@ -22,6 +22,8 @@ include-package-data = true
 [project.entry-points."multiqc.modules.v1"]
 strainline = "damlabqc.modules.strainline:MultiqcModule"
 dorado = "damlabqc.modules.dorado:MultiqcModule"
+deletion_frequency = "damlabqc.modules.deletion_frequency:MultiqcModule"
+
 [project.entry-points."multiqc.cli_options.v1"]
 debug_option = "damlabqc.cli:debug_option"
 
