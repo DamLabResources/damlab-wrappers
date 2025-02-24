@@ -5,9 +5,10 @@ import yaml
 import numpy as np
 
 from multiqc import config
-from multiqc.plots import bargraph, linegraph
-from multiqc.modules.base_module import BaseMultiqcModule
+from multiqc.plots import bargraph, linegraph, heatmap
+from multiqc.base_module import BaseMultiqcModule
 from multiqc.base_module import ModuleNoSamplesFound
+
 
 log = logging.getLogger('damlabqc.hivmetrics')
 
@@ -146,27 +147,71 @@ class MultiqcModule(BaseMultiqcModule):
         )
     
     def _add_length_distribution(self):
-        """Add read length distribution plot."""
-        plot_data = {}
+        """Add read length distribution plot as a heatmap showing percentage of reads at each length."""
+        # Prepare data structures
+        bin_centers = []
+        samples = []
         
+        # First pass to get bin centers and samples
         for s_name, d in self._hivmetrics_data.items():
             if d['length_histogram'] is not None:
                 hist = d['length_histogram']
-                # Create x-coordinates as bin centers
-                x = [(a + b)/2 for a, b in zip(hist['bin_edges'][:-1], hist['bin_edges'][1:])]
-                plot_data[s_name] = {x_coord: y_val for x_coord, y_val in zip(x, hist['counts'])}
+                if not bin_centers:  # Only need to do this once
+                    bin_centers = [(a + b)/2 for a, b in zip(hist['bin_edges'][:-1], hist['bin_edges'][1:])]
+                samples.append(s_name)
+        
+        # Initialize normalized matrix with zeros (transposed orientation)
+        num_bins = len(bin_centers)
+        num_samples = len(samples)
+        normalized_data = [[0] * num_samples for _ in range(num_bins)]
+        
+        # Fill matrix (transposed)
+        for sample_idx, s_name in enumerate(samples):
+            hist = self._hivmetrics_data[s_name]['length_histogram']
+            raw_counts = hist['counts']
+            total_reads = sum(raw_counts)
+            
+            for length_idx, count in enumerate(raw_counts):
+                # Normalized counts (percentage of reads for this sample)
+                if total_reads > 0:
+                    normalized_data[length_idx][sample_idx] = count/total_reads
+        
+        # Reverse the order of rows so longer fragments are at the top
+        normalized_data.reverse()
+        bin_centers.reverse()
 
-        if plot_data:
+        if normalized_data:
+            # Format length labels for y-axis
+            y_labels = [f"{int(x):,}" for x in bin_centers]
+            
             self.add_section(
                 name='Read Length Distribution',
                 anchor='hivmetrics-length-dist',
-                description='Distribution of mapped read lengths',
-                plot=linegraph.plot(plot_data,
-                                  pconfig={
-                                      'id': 'hivmetrics_length_dist',
-                                      'title': 'HIVmetrics: Read Length Distribution',
-                                      'xlab': 'Read Length (bp)',
-                                      'ylab': 'Number of Reads',
-                                      'smooth_points': 200
-                                  })
+                description='Distribution of mapped read lengths. Each column represents a sample, and the color intensity indicates the percentage of reads at each length. Longer fragments appear near the top, similar to an agarose gel.',
+                plot=heatmap.plot(
+                    normalized_data,
+                    xcats=samples,
+                    ycats=y_labels,
+                    pconfig={
+                        'id': 'hivmetrics_length_dist',
+                        'title': 'HIVmetrics: Read Length Distribution',
+                        'xlab': 'Sample',
+                        'ylab': 'Read Length (bp)',
+                        'zlab': 'Percentage of Reads',
+                        'min': 0,
+                        'max': 1,
+                        'square': False,
+                        'colstops': [
+                            [0, '#FFFFFF'],
+                            [0.001, '#FFF7EC'],  # Very light color at 0.1%
+                            [0.01, '#FEE8C8'],   # Light color at 1%
+                            [0.1, '#FDD49E'],    # Medium color at 10%
+                            [0.5, '#FC8D59'],    # Darker color at 50%
+                            [1, '#B30000']       # Deep red at 100%
+                        ],
+                        'height': 500,
+                        'ycats_samples': False,
+                        'xcats_samples': True
+                    }
+                )
             ) 
