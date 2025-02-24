@@ -58,10 +58,10 @@ cmd += f" {extra_params}"
 cmd += f" {threads}"
 
 if is_directory:
-    cmd += f"-o {output}"
+    cmd += f" -o {output}"
     shell(path_cmd + cmd)
 else:
     with tempfile.TemporaryDirectory(delete=False) as tmpdir:
-        cmd += f"-o {tmpdir}"
+        cmd += f" -o {tmpdir}"
         shell(path_cmd + cmd)
         shutil.move(join(tmpdir, "filter_by_abun", "haplotypes.final.fa"), output)

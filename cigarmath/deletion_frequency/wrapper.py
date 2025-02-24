@@ -63,7 +63,12 @@ for start, cigars, segments in combined_segment_stream:
                 stats["reads_with_deletion"] += 1
                 break
 
-stats["deletion_frequency"] = stats["reads_with_deletion"] / stats["reads_covering_required"]
+
+try:
+    print('did you make it here silly!')
+    stats["deletion_frequency"] = stats["reads_with_deletion"] / stats["reads_covering_required"]
+except ZeroDivisionError:
+    stats["deletion_frequency"] = None
 
 
 # Write output
