@@ -2,6 +2,7 @@ from collections import OrderedDict
 import logging
 import os
 import yaml
+import csv
 import numpy as np
 
 from multiqc import config
@@ -23,6 +24,7 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Initialize data storage
         self._hivmetrics_data = dict()
+        self._pileup_data = dict()
         
         self._collect_log_files()
         self._add_general_stats()
@@ -30,11 +32,17 @@ class MultiqcModule(BaseMultiqcModule):
     
     def _collect_log_files(self):
         """Collect data from log files found by multiqc."""
-        for f in self.find_log_files('hivmetrics'):
+        # Collect basic metrics
+        for f in self.find_log_files('hivmetrics/basic'):
             self._parse_hivmetrics_log(f)
+            
+        # Collect pileup data
+        for f in self.find_log_files('hivmetrics/pileup'):
+            self._parse_pileup_log(f)
 
         # Filter out ignored samples
         self._hivmetrics_data = self.ignore_samples(self._hivmetrics_data)
+        self._pileup_data = self.ignore_samples(self._pileup_data)
 
         # No samples found
         if len(self._hivmetrics_data) == 0:
@@ -61,6 +69,41 @@ class MultiqcModule(BaseMultiqcModule):
         except Exception as e:
             log.warning(f"Error parsing file {f['fn']}: {e}")
             raise e
+            
+    def _parse_pileup_log(self, f):
+        """Parse pileup TSV file."""
+        try:
+            s_name = self.clean_s_name(f['s_name'], f)
+            
+            positions = []
+            depths = []
+            entropies = []
+            
+            # Parse TSV file using csv module
+            for row in csv.reader(f['f'].splitlines(), delimiter='\t'):
+                if not row:  # Skip empty lines
+                    continue
+                if row[0] == 'Position':  # Skip header
+                    continue
+                    
+                positions.append(int(row[0]))
+                depths.append(int(row[1]))
+                entropies.append(float(row[2]))
+            
+            if positions:  # Only store if we have data
+                self._pileup_data[s_name] = {
+                    'positions': np.array(positions),  # Convert to numpy arrays for better performance
+                    'depths': np.array(depths),
+                    'entropies': np.array(entropies),
+                    'max_depth': max(depths),
+                    'mean_depth': np.mean(depths),
+                    'max_entropy': max(entropies),
+                    'mean_entropy': np.mean(entropies)
+                }
+                
+        except Exception as e:
+            log.warning(f"Error parsing pileup file {f['fn']}: {e}")
+            raise e
     
     def _add_general_stats(self):
         """Add to the general stats table at the top of the report."""
@@ -74,6 +117,13 @@ class MultiqcModule(BaseMultiqcModule):
                 'supplementary_reads': data['supplementary_reads'],
                 'mean_length': data['mean_mapped_length']
             }
+            
+            # Add pileup stats if available
+            if s_name in self._pileup_data:
+                general_stats_data[s_name].update({
+                    'max_depth': self._pileup_data[s_name]['max_depth'],
+                    'mean_depth': self._pileup_data[s_name]['mean_depth']
+                })
 
         headers = {
             'total_reads': {
@@ -99,18 +149,18 @@ class MultiqcModule(BaseMultiqcModule):
                 'format': '{:,.1%}',
                 'placement': 1200
             },
-            'supplementary_reads': {
-                'title': 'Supplementary',
-                'description': 'Number of supplementary alignments',
-                'scale': 'PuRd',
+            'max_depth': {
+                'title': 'Max Depth',
+                'description': 'Maximum coverage depth',
+                'scale': 'BuPu',
                 'format': '{:,.0f}',
                 'placement': 1300
             },
-            'mean_length': {
-                'title': 'Mean Length',
-                'description': 'Mean length of mapped reads',
+            'mean_depth': {
+                'title': 'Mean Depth',
+                'description': 'Mean coverage depth',
                 'scale': 'BuPu',
-                'format': '{:,.0f}',
+                'format': '{:,.1f}',
                 'placement': 1400
             }
         }
@@ -121,6 +171,8 @@ class MultiqcModule(BaseMultiqcModule):
         """Add sections to MultiQC report."""
         self._add_mapping_stats()
         self._add_length_distribution()
+        self._add_coverage_plot()
+        self._add_entropy_plot()
     
     def _add_mapping_stats(self):
         """Add mapping statistics plot."""
@@ -144,6 +196,61 @@ class MultiqcModule(BaseMultiqcModule):
                                  'ylab': 'Number of Reads',
                                  'stacking': 'normal'
                              })
+        )
+    
+    def _add_coverage_plot(self):
+        """Add coverage depth line plot."""
+        if not self._pileup_data:
+            return
+            
+        plot_data = {}
+        for s_name, d in self._pileup_data.items():
+            plot_data[s_name] = {
+                'x': d['positions'],
+                'y': d['depths']
+            }
+            
+        self.add_section(
+            name='Coverage Depth',
+            anchor='hivmetrics-coverage',
+            description='Coverage depth across the genome',
+            plot=linegraph.plot(plot_data,
+                              pconfig={
+                                  'id': 'hivmetrics_coverage',
+                                  'title': 'HIVmetrics: Coverage Depth',
+                                  'ylab': 'Depth',
+                                  'xlab': 'Position',
+                                  'ymin': 0,
+                                  'smooth_points': 100
+                              })
+        )
+        
+    def _add_entropy_plot(self):
+        """Add base entropy line plot."""
+        if not self._pileup_data:
+            return
+            
+        plot_data = {}
+        for s_name, d in self._pileup_data.items():
+            plot_data[s_name] = {
+                'x': d['positions'],
+                'y': d['entropies']
+            }
+            
+        self.add_section(
+            name='Base Entropy',
+            anchor='hivmetrics-entropy',
+            description='Shannon entropy of base composition across the genome. Higher values indicate more base diversity at that position.',
+            plot=linegraph.plot(plot_data,
+                              pconfig={
+                                  'id': 'hivmetrics_entropy',
+                                  'title': 'HIVmetrics: Base Entropy',
+                                  'ylab': 'Entropy',
+                                  'xlab': 'Position',
+                                  'ymin': 0,
+                                  'ymax': np.log2(6),
+                                  'smooth_points': 100
+                              })
         )
     
     def _add_length_distribution(self):

@@ -1,0 +1,25 @@
+rule all:
+    input:
+        'test_output.tsv'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_pileup:
+    input:
+        'test.bam'
+    output:
+        'test_output.tsv'
+    params:
+        min_mapq = 20
+    wrapper:
+        "file:../"
+
+rule make_test_bam:
+    input:
+        '../../test_data/test.sam'
+    output:
+        temp('test.bam')
+    params:
+        extra = '-n'
+    wrapper:
+        "v5.8.2/bio/samtools/sort" 
