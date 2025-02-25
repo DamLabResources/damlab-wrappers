@@ -6,6 +6,7 @@ from multiqc import config
 from multiqc.plots import bargraph
 from multiqc.base_module import BaseMultiqcModule
 from multiqc.base_module import ModuleNoSamplesFound
+from multiqc.plots import violin
 
 log = logging.getLogger('damlabqc.deletion_frequency')
 
@@ -123,8 +124,37 @@ class MultiqcModule(BaseMultiqcModule):
     
     def _add_sections(self):
         """Add sections to MultiQC report."""
+        self._add_deletion_violin()
         for region in sorted(self._regions):
             self._add_deletion_stats(region)
+    
+    def _add_deletion_violin(self):
+        """Add violin plot of deletion frequencies for all regions."""
+        # Create violin data
+        violin_data = {}
+        
+        # Collect deletion frequencies for each sample
+        for s_name, regions in self._deletion_freq_data.items():
+            violin_data[s_name] = {}
+            for region in sorted(self._regions):
+                if region in regions:
+                    violin_data[s_name][region] = regions[region]['deletion_frequency']
+
+        self.add_section(
+            name='Deletion Frequency Distribution',
+            anchor='deletion-frequency-violin',
+            description='Distribution of deletion frequencies across samples for all regions',
+            plot=violin.plot(violin_data,
+                            pconfig={
+                                'id': 'deletion_frequency_violin',
+                                'title': 'Deletion Frequency Distribution',
+                                'ylab': 'Deletion Frequency',
+                                'ymin': 0,
+                                'ymax': 1,
+                                'violin_width': 0.8,
+                                'violin_box': True  # Show box plot inside violin
+                            })
+        )
     
     def _add_deletion_stats(self, region):
         """Add deletion statistics plot for a specific region."""
