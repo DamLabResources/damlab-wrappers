@@ -4,6 +4,7 @@ import os
 import yaml
 import csv
 import numpy as np
+import math
 
 from multiqc import config
 from multiqc.plots import bargraph, linegraph, heatmap
@@ -92,13 +93,13 @@ class MultiqcModule(BaseMultiqcModule):
             
             if positions:  # Only store if we have data
                 self._pileup_data[s_name] = {
-                    'positions': np.array(positions),  # Convert to numpy arrays for better performance
-                    'depths': np.array(depths),
-                    'entropies': np.array(entropies),
+                    'positions': positions,  # Store as lists instead of numpy arrays
+                    'depths': depths,
+                    'entropies': entropies,
                     'max_depth': max(depths),
-                    'mean_depth': np.mean(depths),
+                    'mean_depth': sum(depths) / len(depths),
                     'max_entropy': max(entropies),
-                    'mean_entropy': np.mean(entropies)
+                    'mean_entropy': sum(entropies) / len(entropies)
                 }
                 
         except Exception as e:
@@ -199,30 +200,55 @@ class MultiqcModule(BaseMultiqcModule):
         )
     
     def _add_coverage_plot(self):
-        """Add coverage depth line plot."""
+        """Add coverage depth line plot with both raw and normalized views."""
         if not self._pileup_data:
             return
             
-        plot_data = {}
+        # Create two datasets - raw depths and normalized percentages
+        raw_data = {}
+        norm_data = {}
+        
         for s_name, d in self._pileup_data.items():
-            plot_data[s_name] = {
-                'x': d['positions'],
-                'y': d['depths']
-            }
+            # Raw depth data
+            raw_data[s_name] = dict(zip(d['positions'], d['depths']))
             
+            # Normalized data (as percentages)
+            max_depth = max(d['depths'])
+            if max_depth > 0:  # Avoid division by zero
+                norm_data[s_name] = {
+                    pos: (depth / max_depth) * 100 
+                    for pos, depth in zip(d['positions'], d['depths'])
+                }
+            else:
+                norm_data[s_name] = dict(zip(d['positions'], [0] * len(d['positions'])))
+        
         self.add_section(
             name='Coverage Depth',
             anchor='hivmetrics-coverage',
-            description='Coverage depth across the genome',
-            plot=linegraph.plot(plot_data,
-                              pconfig={
-                                  'id': 'hivmetrics_coverage',
-                                  'title': 'HIVmetrics: Coverage Depth',
-                                  'ylab': 'Depth',
-                                  'xlab': 'Position',
-                                  'ymin': 0,
-                                  'smooth_points': 100
-                              })
+            description='Coverage depth across the genome. Switch between raw depth and normalized percentage views.',
+            plot=linegraph.plot(
+                [raw_data, norm_data],  # List of datasets
+                pconfig={
+                    'id': 'hivmetrics_coverage',
+                    'title': 'HIVmetrics: Coverage Depth',
+                    'ymin': 0,
+                    'smooth_points': 100,
+                    'data_labels': [
+                        {
+                            'name': 'Raw Depth',
+                            'ylab': 'Depth',
+                            'xlab': 'Position',
+                            'tt_label': 'Position {x}: {y:.0f} reads'
+                        },
+                        {
+                            'name': 'Normalized',
+                            'ylab': 'Percentage of Maximum Depth',
+                            'xlab': 'Position',
+                            'tt_label': 'Position {x}: {y:.1f}%'
+                        }
+                    ]
+                }
+            )
         )
         
     def _add_entropy_plot(self):
@@ -232,10 +258,8 @@ class MultiqcModule(BaseMultiqcModule):
             
         plot_data = {}
         for s_name, d in self._pileup_data.items():
-            plot_data[s_name] = {
-                'x': d['positions'],
-                'y': d['entropies']
-            }
+            # Create dictionary mapping positions to entropy values
+            plot_data[s_name] = dict(zip(d['positions'], d['entropies']))
             
         self.add_section(
             name='Base Entropy',
@@ -248,8 +272,9 @@ class MultiqcModule(BaseMultiqcModule):
                                   'ylab': 'Entropy',
                                   'xlab': 'Position',
                                   'ymin': 0,
-                                  'ymax': np.log2(6),
-                                  'smooth_points': 100
+                                  'ymax': math.log2(6),
+                                  'smooth_points': 100,
+                                  'tt_label': 'Position {x}: {y:.3f}'
                               })
         )
     

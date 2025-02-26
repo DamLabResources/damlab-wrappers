@@ -18,7 +18,9 @@ def add_config():
                                                   "num_lines": 10}})
         
     if "hivmetrics" not in config.sp:
-        config.update_dict(config.sp, {"hivmetrics": {"contents": "# HIVmetrics MultiQC Log",
+        config.update_dict(config.sp, {"hivmetrics/basic": {"contents": "# HIVmetrics MultiQC Log",
+                                                  "num_lines": 10}})
+        config.update_dict(config.sp, {"hivmetrics/pileup": {"contents": "Position\tDepth\tEntropy\tA\tC\tG\tT\tN\t-",
                                                   "num_lines": 10}})
 
     if "deletion_frequency" not in config.sp:
