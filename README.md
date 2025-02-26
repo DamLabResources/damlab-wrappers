@@ -46,7 +46,8 @@ This package contains wrappers for the Nanopore dorado tool.
  - [`dorado/duplex`](dorado/duplex/README.md) : Nanopore dorado duplex basecalling tool. Supports GPU acceleration and optional reference-based alignment.
  - [`dorado/simplex`](dorado/simplex/README.md) : Nanopore dorado simplex basecalling tool. Supports GPU acceleration and optional reference-based alignment.
  - [`dorado/demux`](dorado/demux/README.md) : Nanopore dorado demultiplexing tool. Supports various barcoding kits and custom barcode arrangements.
- - more to come as needed...
+ - [`dorado/aligner`](dorado/aligner/README.md) : Nanopore dorado aligner tool. Supports GPU acceleration and optional reference-based alignment.
+
 
 ## POD5
 
