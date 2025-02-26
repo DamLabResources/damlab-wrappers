@@ -90,6 +90,9 @@ A collection of snakemake wrappers of Python APIs for visualization.
 
 - [`visualization/jaspar2logo`](visualization/jaspar2logo/README.md) : Create sequence logos from frequency counts.
 
+## Miscellaneous
+
+- [`picard/addorreplacereadgroups`](picard/addorreplacereadgroups/README.md) : Picard tool to add or replace read groups in a BAM file. Slightly modified to have an easier way to set parameters.
 
 ## Testing
 

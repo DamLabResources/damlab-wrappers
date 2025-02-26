@@ -1,0 +1,69 @@
+from os.path import join
+
+rule all:
+    input:
+        "test_output/basic.bam",
+        "test_output/full.bam",
+        "test_output/minimal.bam"
+    conda: "env.yaml"
+    shell: "pytest tests.py"
+
+# Test with basic required parameters
+rule test_basic:
+    input:
+        "test_data/input.bam"
+    output:
+        temp("test_output/basic.bam")
+    params:
+        ID="test_id",
+        LB="test_lib",
+        PL="ILLUMINA",
+        PU="unit1",
+        SM="sample1"
+    wrapper:
+        "file:../"
+
+# Test with all parameters
+rule test_full:
+    input:
+        "test_data/input.bam"
+    output:
+        temp("test_output/full.bam")
+    params:
+        # Required params
+        ID="full_id",
+        LB="full_lib",
+        PL="ILLUMINA",
+        PU="unit2",
+        SM="sample2",
+        # Optional params
+        CN="test_center",
+        DS="test description",
+        DT="2024-01-01",
+        PM="NextSeq2000",
+        # Extra params
+        extra="--VALIDATION_STRINGENCY LENIENT"
+    wrapper:
+        "file:../"
+
+# Test with minimal parameters and different platform
+rule test_minimal:
+    input:
+        "test_data/input.bam"
+    output:
+        temp("test_output/minimal.bam")
+    params:
+        ID="min_id",
+        LB="min_lib",
+        PL="ONT",
+        PU="unit3",
+        SM="sample3"
+    wrapper:
+        "file:../" 
+
+rule generate_test_data:
+    output:
+        temp("test_data/input.bam")
+    conda: "env.yaml"
+    shell:
+        "python generate_test_data.py"

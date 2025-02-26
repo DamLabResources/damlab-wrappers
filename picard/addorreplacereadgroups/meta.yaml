@@ -1,0 +1,29 @@
+name: picard AddOrReplaceReadGroups
+description: Add or replace read groups in a BAM file
+authors:
+  - Will Dampier
+input:
+  - BAM file
+output:
+  - BAM file with read groups added/replaced
+notes: |
+  * Wrapper for Picard's AddOrReplaceReadGroups tool
+  * Provides structured interface for specifying read group parameters
+  * Requires Java runtime
+params:
+  required:
+    - ID: Read Group ID
+    - LB: Read Group Library
+    - PL: Read Group platform
+    - PU: Read Group platform unit
+    - SM: Read Group sample name
+  optional:
+    - CN: Read Group sequencing center name
+    - DS: Read Group description
+    - DT: Read Group run date
+    - FO: Read Group flow order
+    - KS: Read Group key sequence
+    - PG: Read Group program group
+    - PI: Read Group predicted insert size
+    - PM: Read Group platform model
+    - extra: Additional command line parameters 

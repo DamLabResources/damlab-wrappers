@@ -12,7 +12,7 @@ make test:
 	make test_tool tool=phylo/reroot profile=test
 	make test_tool tool=pod5/convert_fast5 profile=test
 	make test_tool tool=pod5/split_by_channel profile=test
-
+	make test_tool tool=picard/addorreplacereadgroups profile=test
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile
 
