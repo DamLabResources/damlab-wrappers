@@ -94,7 +94,7 @@ with tempfile.TemporaryDirectory(dir=snakemake.params.get("tempdir", None)) as t
         # Extract barcode from filename
         for barcode, output_name in barcode_to_output.items():
             if f"_{barcode}" in filename:
-                target_file = os.path.join(output_dir, output_name)
+                target_file = os.path.join(output_dir, output_name) + extension
                 if path.exists(target_file):
                     os.remove(target_file)
                 shutil.move(file, target_file)
