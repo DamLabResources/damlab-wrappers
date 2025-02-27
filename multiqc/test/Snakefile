@@ -17,6 +17,7 @@ rule multiqc:
         expand("build/hivmetrics/{sample}.hivmetrics.yaml", sample=SAMPLES),
         expand("build/deletion_frequency/{sample}.p24.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml", sample=SAMPLES),
+        expand("build/generic/{sample}.generic.yaml", sample=SAMPLES),
     output:
         report = "build/multiqc/multiqc_report.html",
         data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
@@ -116,4 +117,13 @@ rule convert_to_bam:
         temp("{tool}/{sample}.bam")
     wrapper:
         "v5.8.0/bio/samtools/view"
+
+rule generic_mqc:
+    output:
+        "build/generic/{sample}.generic.yaml"
+    params:
+        sample_name = lambda wildcards: wildcards.sample,
+        gel_band = lambda wildcards: "yes" if wildcards.sample in ["sample1", "sample2"] else "no"
+    wrapper:
+        "file:../generic"
     

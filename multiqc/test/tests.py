@@ -63,3 +63,20 @@ def test_dorado():
     assert float(sample3['dorado-duplex_reads']) == 3
     assert float(sample3['dorado-duplex_rate']) == pytest.approx(0.429, abs=0.01)  # 3/7
 
+
+def test_generic():
+    data = get_general_stats_data()
+    assert len(data) == 3
+
+    # Check that the wanted column is present
+    assert 'generic-gel_band' in data[0]
+    
+    # Check that the data is correct for each sample
+    sample1 = next(row for row in data if row['Sample'] == 'sample1')
+    sample2 = next(row for row in data if row['Sample'] == 'sample2')
+    sample3 = next(row for row in data if row['Sample'] == 'sample3')
+    
+    assert sample1['generic-gel_band'] == 'yes'
+    assert sample2['generic-gel_band'] == 'yes'
+    assert sample3['generic-gel_band'] == 'no'
+

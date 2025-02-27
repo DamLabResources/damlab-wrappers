@@ -26,3 +26,7 @@ def add_config():
     if "deletion_frequency" not in config.sp:
         config.update_dict(config.sp, {"deletion_frequency": {"contents": "# Cigarmath Deletion Frequency",
                                                   "num_lines": 10}})
+        
+    if "generic" not in config.sp:
+        config.update_dict(config.sp, {"generic": {"contents": "# Generic MultiQC Log",
+                                                  "num_lines": 10}})
