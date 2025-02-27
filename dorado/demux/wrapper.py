@@ -20,6 +20,9 @@ if "snakemake" not in locals():
 reads = snakemake.input.reads
 output_dir = snakemake.output[0]
 
+# Create output directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
+
 # Get required parameters
 kit_name = snakemake.params.get("kit_name", "")
 if not kit_name and not snakemake.params.get("no_classify", False):
@@ -88,12 +91,10 @@ with tempfile.TemporaryDirectory(dir=snakemake.params.get("tempdir", None)) as t
     extension = ".fastq" if emit_fastq else ".bam"
     for file in glob.glob(f"{temp_output}/*{extension}"):
         filename = os.path.basename(file)
-        print(filename)
         # Extract barcode from filename
-        for barcode, output_idx in barcode_to_output.items():
+        for barcode, output_name in barcode_to_output.items():
             if f"_{barcode}" in filename:
-                target_file = snakemake.output[output_idx]
-                print(file, target_file)
+                target_file = os.path.join(output_dir, output_name)
                 if path.exists(target_file):
                     os.remove(target_file)
                 shutil.move(file, target_file)
@@ -102,8 +103,8 @@ with tempfile.TemporaryDirectory(dir=snakemake.params.get("tempdir", None)) as t
     
     # Anything left in barcode_to_output is missing
     # Create empty files for them to keep snakemake happy
-    for barcode, output_idx in barcode_to_output.items():
-        target_file = snakemake.output[output_idx]
+    for barcode, output_name in barcode_to_output.items():
+        target_file = os.path.join(output_dir, output_name)
         if path.exists(target_file):
             os.remove(target_file)
         shell(f"touch {target_file}")

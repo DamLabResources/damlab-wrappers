@@ -7,7 +7,7 @@ This tool splits reads into separate files based on the barcode sequence.
 * `reads`: Path to input reads file or directory (required)
 
 ## Outputs
-* Directory or list of files containing demultiplexed reads
+* `directory`: Output directory for demultiplexed reads
 
 ## Parameters
 * `kit_name`: Name of the barcoding kit (required unless no_classify=True)
@@ -22,7 +22,7 @@ This tool splits reads into separate files based on the barcode sequence.
 * `sort_bam`: Sort output BAM files (default: False)
 * `barcode_arrangement`: Custom barcode arrangement (optional)
 * `barcode_sequences`: Custom barcode sequences (optional)
-* `barcode_to_output`: Dictionary mapping barcodes to output indices
+* `barcode_to_output`: Dictionary mapping barcodes to output filenames
 * `tempdir`: Directory for temporary files (optional)
 * `no_classify`: Skip barcode classification (default: False)
 
@@ -33,14 +33,13 @@ rule dorado_demux:
     input:
         reads="path/to/reads.bam"
     output:
-        "path/to/output_dir/barcode01.bam",
-        "path/to/output_dir/barcode02.bam"
+        directory("path/to/output_dir")
     params:
         kit_name="SQK-RBK004",
         emit_fastq=True,
         barcode_to_output={
-            "barcode01": 0,
-            "barcode02": 1
+            "barcode01": "sample1.fastq",
+            "barcode02": "sample2.fastq"
         }
     threads: 8
     wrapper:
