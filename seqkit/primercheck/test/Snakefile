@@ -1,0 +1,22 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'results.csv',
+        'summary.yaml'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_primercheck:
+    input:
+        reads = 'seqs4amplicon.fa',
+        primers = 'primers.tsv'
+    output:
+        'results.csv',
+        summary = 'summary.yaml'
+    log:
+        'test.log'
+    wrapper:
+        "file:../" 
