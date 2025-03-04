@@ -121,7 +121,7 @@ class MultiqcModule(BaseMultiqcModule):
         """Add sections to MultiQC report."""
         self._add_read_counts()
         self._add_read_lengths()
-        self._add_pass_rates()
+        #self._add_pass_rates()
     
     def _add_read_counts(self):
         """Add read count distribution plots."""

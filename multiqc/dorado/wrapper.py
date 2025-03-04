@@ -75,7 +75,7 @@ def parse_dorado_bam(bam_file, sample_name=None):
                 metrics[category]['passed_reads'] += 1
             
             metrics[category]['lengths'].append(read.query_length)
-            metrics[category]['qscores'].append(read.get_tag('qm'))
+            metrics[category]['qscores'].append(read.mapping_quality if read.mapping_quality is not None else 0)
     
     # Calculate summary statistics
     for category in ['simplex', 'duplex']:

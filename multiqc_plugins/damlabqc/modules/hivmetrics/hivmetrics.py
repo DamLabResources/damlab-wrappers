@@ -86,6 +86,9 @@ class MultiqcModule(BaseMultiqcModule):
                     continue
                 if row[0] == 'Position':  # Skip header
                     continue
+
+                if int(row[0]) > 15_000:
+                    continue
                     
                 positions.append(int(row[0]))
                 depths.append(int(row[1]))
@@ -238,13 +241,13 @@ class MultiqcModule(BaseMultiqcModule):
                             'name': 'Raw Depth',
                             'ylab': 'Depth',
                             'xlab': 'Position',
-                            'tt_label': 'Position {x}: {y:.0f} reads'
+                            #'tt_label': 'Position {x}: {y:.0f} reads'
                         },
                         {
                             'name': 'Normalized',
                             'ylab': 'Percentage of Maximum Depth',
                             'xlab': 'Position',
-                            'tt_label': 'Position {x}: {y:.1f}%'
+                            #'tt_label': 'Position {x}: {y:.1f}%'
                         }
                     ]
                 }
@@ -274,7 +277,7 @@ class MultiqcModule(BaseMultiqcModule):
                                   'ymin': 0,
                                   'ymax': math.log2(6),
                                   'smooth_points': 100,
-                                  'tt_label': 'Position {x}: {y:.3f}'
+                                  #'tt_label': 'Position {x}: {y:.3f}'
                               })
         )
     

@@ -40,7 +40,7 @@ input_bam = snakemake.input[0]
 output_tsv = snakemake.output[0]
 
 # Get optional parameters
-region = snakemake.params.get("region", None)
+chrom = snakemake.params.get("chrom", None)
 min_mapq = snakemake.params.get("min_mapq", 0)
 
 # Initialize combined pileup counts
@@ -50,12 +50,14 @@ combined_counts = defaultdict(Counter)
 segment_stream = cm.io.segment_stream_pysam(
     input_bam, 
     mode='rb',
-    fetch=region,
     min_mapq=min_mapq
 )
 
 # Process each segment
 for segment in segment_stream:
+    if chrom and segment.reference_name != chrom:
+        continue
+    
     if not segment.cigartuples or not segment.query_sequence:
         continue
         
