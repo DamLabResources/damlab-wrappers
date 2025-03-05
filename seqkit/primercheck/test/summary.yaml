@@ -1,3 +1,4 @@
+# Seqkit Primer Check Summary
 pairwise_hits:
   P5_x_p1: 0
   P5_x_p2: 0
@@ -21,4 +22,5 @@ primer_hits:
   p3: 1
   p4: 2
   p6: 1
+sample_name: sample1
 total_sequences: 2

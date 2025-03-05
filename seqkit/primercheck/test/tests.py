@@ -46,4 +46,7 @@ def test_summary_format():
         # Check primer hits
         assert summary['primer_hits']['p1'] == 1  # Only hits seq1
         assert summary['primer_hits']['p4'] == 2  # Hits both sequences
+
+        # Check sample name
+        assert summary['sample_name'] == 'sample1'
         

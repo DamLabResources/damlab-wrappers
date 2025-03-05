@@ -16,6 +16,8 @@ rule test_primercheck:
     output:
         'results.csv',
         summary = 'summary.yaml'
+    params:
+        sample_name = 'sample1'
     log:
         'test.log'
     wrapper:
