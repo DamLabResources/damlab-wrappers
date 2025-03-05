@@ -18,6 +18,7 @@ rule multiqc:
         expand("build/deletion_frequency/{sample}.p24.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/generic/{sample}.generic.yaml", sample=SAMPLES),
+        expand("build/primercheck/{sample}.primercheck.yaml", sample=SAMPLES)
     output:
         report = "build/multiqc/multiqc_report.html",
         data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
@@ -126,4 +127,18 @@ rule generic_mqc:
         gel_band = lambda wildcards: "yes" if wildcards.sample in ["sample1", "sample2"] else "no"
     wrapper:
         "file:../generic"
+
+rule primercheck_mqc:
+    input:
+        reads = "data/seqs_{sample}.fa",
+        primers = "data/primers.tsv"
+    output:
+        csv = "build/primercheck/{sample}.results.csv",
+        summary = "build/primercheck/{sample}.primercheck.yaml"
+    params:
+        sample_name = lambda wildcards: wildcards.sample,
+    log:
+        "build/primercheck/{sample}.log"
+    wrapper:
+        "file:../../seqkit/primercheck"
     

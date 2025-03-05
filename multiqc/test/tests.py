@@ -80,3 +80,35 @@ def test_generic():
     assert sample2['generic-gel_band'] == 'yes'
     assert sample3['generic-gel_band'] == 'no'
 
+
+def test_primercheck():
+    data = get_general_stats_data()
+
+    assert len(data) == 3
+
+    # Check that all expected columns are present
+    wanted_cols = [
+        "primercheck-total_sequences",
+        "primercheck-primer_primer1",
+        "primercheck-primer_primer2",
+    ]
+    assert all(col in data[0] for col in wanted_cols)
+    
+    # Check sample1 data (4/5 reads with primer1, 1/5 with primer2/3)
+    sample1 = next(row for row in data if row['Sample'] == 'sample1')
+    assert float(sample1['primercheck-total_sequences']) == 5
+    assert float(sample1['primercheck-primer_primer1']) == pytest.approx(0.8)  # 4/5 reads
+    assert float(sample1['primercheck-primer_primer2']) == pytest.approx(0.2)  # 1/5 reads
+    
+    # Check sample2 data (2/5 with primer1, 3/5 with primer2/3)
+    sample2 = next(row for row in data if row['Sample'] == 'sample2')
+    assert float(sample2['primercheck-total_sequences']) == 5
+    assert float(sample2['primercheck-primer_primer1']) == pytest.approx(0.4)  # 2/5 reads
+    assert float(sample2['primercheck-primer_primer2']) == pytest.approx(0.6)  # 3/5 reads
+    
+    # Check sample3 data (all reads with primer2/3)
+    sample3 = next(row for row in data if row['Sample'] == 'sample3')
+    assert float(sample3['primercheck-total_sequences']) == 4
+    assert float(sample3['primercheck-primer_primer1']) == pytest.approx(0.0)  # No reads
+    assert float(sample3['primercheck-primer_primer2']) == pytest.approx(1.0)  # All reads
+

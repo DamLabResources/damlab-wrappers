@@ -30,3 +30,7 @@ def add_config():
     if "generic" not in config.sp:
         config.update_dict(config.sp, {"generic": {"contents": "# Generic MultiQC Log",
                                                   "num_lines": 10}})
+
+    if "primercheck" not in config.sp:
+        config.update_dict(config.sp, {"primercheck": {"contents": "# Seqkit Primer Check Summary",
+                                                       "num_lines": 10}})

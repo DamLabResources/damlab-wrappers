@@ -29,9 +29,6 @@ summary_yaml = snakemake.output.get("summary", None)
 extra = snakemake.params.get("extra", "")
 sample_name = snakemake.params.get("sample_name", None)
 
-print('sample name', sample_name)
-raise Exception('stop')
-
 # Setup log
 log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 

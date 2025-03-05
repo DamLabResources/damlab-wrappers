@@ -25,6 +25,7 @@ dorado = "damlabqc.modules.dorado:MultiqcModule"
 deletion_frequency = "damlabqc.modules.deletion_frequency:MultiqcModule"
 hivmetrics = "damlabqc.modules.hivmetrics:MultiqcModule"
 generic = "damlabqc.modules.generic:MultiqcModule"
+primercheck = "damlabqc.modules.primercheck:MultiqcModule"
 
 [project.entry-points."multiqc.cli_options.v1"]
 debug_option = "damlabqc.cli:debug_option"
