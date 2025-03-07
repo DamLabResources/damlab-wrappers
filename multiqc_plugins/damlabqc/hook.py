@@ -34,3 +34,7 @@ def add_config():
     if "primercheck" not in config.sp:
         config.update_dict(config.sp, {"primercheck": {"contents": "# Seqkit Primer Check Summary",
                                                        "num_lines": 10}})
+
+    if "metaqc" not in config.sp:
+        config.update_dict(config.sp, {"metaqc": {"fn": "multiqc_general_stats.txt",
+                                                 "shared": True}})
