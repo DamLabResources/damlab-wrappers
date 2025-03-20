@@ -1,0 +1,18 @@
+rule all:
+    input:
+        'test_output.bam'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_correct_barcodes:
+    input:
+        'test.bam'
+    output:
+        'test_output.bam'
+    params:
+        in_tag='CR',
+        out_tag='CB',
+        barcode_length=34,
+        mismatches=3
+    wrapper:
+        "file:../" 
