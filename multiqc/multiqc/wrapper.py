@@ -11,6 +11,7 @@ if "snakemake" not in locals():
 input_files = snakemake.input
 output_report = snakemake.output.report
 
+
 # Get required prefix parameter
 prefix = snakemake.params.get("prefix")
 if not prefix:
@@ -31,11 +32,13 @@ path_cmd = f"export PATH={prefix}/bin:$PATH && "
 cmd = "multiqc"
 
 # Add input files/directories
-for input_file in input_files:
-    cmd += f" {input_file}"
+#for input_file in input_files:
+#    cmd += f" {input_file}"
 
 # Add output
-cmd += f" -o {os.path.dirname(output_report)}"
+basedir = os.path.dirname(output_report)
+basedir = '.' if not basedir else basedir
+cmd += f" -o {basedir}"
 cmd += f" -n {os.path.basename(output_report)}"
 
 # Add template if specified
@@ -50,8 +53,16 @@ if config:
 if extra_args:
     cmd += f" {extra_args}"
 
+# Add common path of all input files
+common_path = os.path.commonpath([os.path.dirname(str(f)) for f in input_files])
+if common_path:
+    cmd += f" {common_path}"
+else:
+    cmd += ' .'
+
 # Add logging
 cmd += f" {log}"
 
+print(cmd)
 # Run commands
 shell(path_cmd + cmd) 
