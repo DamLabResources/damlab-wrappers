@@ -18,7 +18,8 @@ rule multiqc:
         expand("build/deletion_frequency/{sample}.p24.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/generic/{sample}.generic.yaml", sample=SAMPLES),
-        expand("build/primercheck/{sample}.primercheck.yaml", sample=SAMPLES)
+        expand("build/primercheck/{sample}.primercheck.yaml", sample=SAMPLES),
+        expand("build/intactness/{sample}.intactness.yaml", sample=SAMPLES)
     output:
         report = "build/multiqc/multiqc_report.html",
         data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
@@ -141,4 +142,18 @@ rule primercheck_mqc:
         "build/primercheck/{sample}.log"
     wrapper:
         "file:../../seqkit/primercheck"
+
+rule intactness_mqc:
+    input:
+        "intactness/{sample}.fasta"
+    output:
+        "build/intactness/{sample}.intactness.yaml"
+    params:
+        min_countable=50,
+        max_countable=80,
+        min_intact=70,
+        max_intact=75,
+        sample_name=lambda wildcards: wildcards.sample
+    wrapper:
+        "file:../../hiv/intactness"
     

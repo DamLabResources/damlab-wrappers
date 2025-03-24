@@ -38,3 +38,7 @@ def add_config():
     if "metaqc" not in config.sp:
         config.update_dict(config.sp, {"metaqc": {"fn": "multiqc_general_stats.txt",
                                                  "shared": True}})
+
+    if "intactness" not in config.sp:
+        config.update_dict(config.sp, {"intactness": {"contents": "# HIV Sequence Intactness Statistics",
+                                                     "num_lines": 10}})

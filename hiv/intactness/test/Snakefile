@@ -1,0 +1,43 @@
+rule all:
+    input:
+        'test_fasta_output.yaml',
+        'test_sam_output.yaml'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_intactness_fasta:
+    input:
+        'test.fasta'
+    output:
+        'test_fasta_output.yaml'
+    params:
+        min_countable=50,
+        max_countable=80,
+        min_intact=70,
+        max_intact=75,
+        sample_name='test_fasta'
+    wrapper:
+        "file:../"
+
+rule sam_to_bam:
+    input:
+        'test.sam'
+    output:
+        'test.bam'
+    conda: 'env.yaml'
+    shell:
+        "samtools view -b {input} > {output}"
+
+rule test_intactness_sam:
+    input:
+        'test.bam'
+    output:
+        'test_sam_output.yaml'
+    params:
+        min_countable=50,
+        max_countable=80,
+        min_intact=70,
+        max_intact=75,
+        sample_name='test_sam'
+    wrapper:
+        "file:../" 

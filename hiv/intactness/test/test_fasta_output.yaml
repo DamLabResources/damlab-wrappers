@@ -1,0 +1,7 @@
+# HIV Sequence Intactness Statistics
+countable_reads: 4
+intact_reads: 1
+percent_countable: 66.66666666666666
+percent_intact: 25.0
+sample_name: test_fasta
+total_reads: 6

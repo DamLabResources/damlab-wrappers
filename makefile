@@ -14,6 +14,7 @@ make test:
 	make test_tool tool=pod5/split_by_channel profile=test
 	make test_tool tool=picard/addorreplacereadgroups profile=test
 	make test_tool tool=seqkit/primercheck profile=test
+	make test_tool tool=hiv/intactness profile=test
 	
 test_tool:
 	snakemake --profile profiles/$(profile) -d $(tool)/test/ -s $(tool)/test/Snakefile

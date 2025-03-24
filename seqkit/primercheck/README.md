@@ -5,7 +5,7 @@ For each read, it reports the amplicon length for each primer pair (or None if n
 
 ## Input
 * `reads`: Input sequence file (FASTA/Q)
-* `primers`: Tab-delimited primer file with columns:
+* `primers`: (optional)Tab-delimited primer file with columns:
     1. Primer name
     2. Forward primer (5'-3')
     3. Reverse primer (5'-3')
@@ -25,6 +25,31 @@ For each read, it reports the amplicon length for each primer pair (or None if n
 
 ## Params
 * `extra`: Optional parameters passed to seqkit amplicon
+* `primer_sets`: (optional) List or string of pre-defined primer sets to use.
+  * `silicano-hiv` : 
+    * Psi-F - CAGGACTCGGCTTGCTGAAG
+    * Psi-R - GCTAGAAGGAGAGAGATGGGTGC
+    * Env-F - AGTGGTGCAGAGAGAAAAAAGAGC
+    * Env-R - GTCTGGCCTGTACCGTCAGC
+    * alt-Psi-F - GCAGGACTCGGCTTGCTG
+    * alt-Psi-R - CTAGAAGGAGAGAGAGATGGGTGC
+  * `jones-hiv` :
+    * Psi-F - CAGGACTCGGCTTGCTGAAG
+    * Psi-R - GCACCCATCTCTCTCCTTCTAGC
+    * Env-F - AGTGGTGCAGAGAGAAAAAAGAGC
+    * Env-R - GTCTGGCCTGTACCGTCAGC
+    * alt-Env-F - ACTATGGGCGCAGCGTC
+    * alt-Env-R - CCCCAGACTGTGAGTTGCA
+  * `Deeks-hiv-SubB` :
+    * Psi-F - TCTCGACGCAGGACTCG
+    * Psi-R - TACTGACGCTCTCGCACC
+    * Env-F - AGTGGTGCAGAGAGAAAAAAGAGC
+    * Env-R - GTCTGGCCTGTACCGTCAGC
+  * `Deeks-hiv-SubC` :
+    * Psi-F - TCTCGACGCAGGACTCG
+    * Psi-R - TATTGACGCTCTCGCACC
+    * Env-F - AGTGGTGGAGAGAGAAAAAAGAGC
+    * Env-R - GTCTGGCCTGTACCGTCAGC
 
 ## Example
 ```python

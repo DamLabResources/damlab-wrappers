@@ -112,3 +112,42 @@ def test_primercheck():
     assert float(sample3['primercheck-primer_primer1']) == pytest.approx(0.0)  # No reads
     assert float(sample3['primercheck-primer_primer2']) == pytest.approx(1.0)  # All reads
 
+
+def test_intactness():
+    data = get_general_stats_data()
+    assert len(data) == 3
+
+    # Check that all expected columns are present
+    wanted_cols = [
+        "intactness-total_reads",
+        "intactness-countable_reads",
+        "intactness-intact_reads",
+        "intactness-percent_countable",
+        "intactness-percent_intact"
+    ]
+    assert all(col in data[0] for col in wanted_cols)
+    
+    # Check sample1 data (5 reads: 2 countable, 1 intact)
+    sample1 = next(row for row in data if row['Sample'] == 'sample1')
+    assert float(sample1['intactness-total_reads']) == 5
+    assert float(sample1['intactness-countable_reads']) == 3
+    assert float(sample1['intactness-intact_reads']) == 1
+    assert float(sample1['intactness-percent_countable']) == pytest.approx(60.0)  # 3/5 * 100
+    assert float(sample1['intactness-percent_intact']) == pytest.approx(33.33, abs=0.01)  # 1/3 * 100
+    
+    # Check sample2 data (5 reads: 3 countable, 2 intact)
+    sample2 = next(row for row in data if row['Sample'] == 'sample2')
+    assert float(sample2['intactness-total_reads']) == 5
+    assert float(sample2['intactness-countable_reads']) == 3
+    assert float(sample2['intactness-intact_reads']) == 2
+    assert float(sample2['intactness-percent_countable']) == pytest.approx(60.0)  # 3/5 * 100
+    assert float(sample2['intactness-percent_intact']) == pytest.approx(66.67, abs=0.01)  # 2/3 * 100
+    
+    # Check sample3 data (4 reads: 4 countable, 1 intact)
+    sample3 = next(row for row in data if row['Sample'] == 'sample3')
+    assert float(sample3['intactness-total_reads']) == 4
+    assert float(sample3['intactness-countable_reads']) == 4
+    assert float(sample3['intactness-intact_reads']) == 1
+    assert float(sample3['intactness-percent_countable']) == pytest.approx(100.0)  # 4/4 * 100
+    assert float(sample3['intactness-percent_intact']) == pytest.approx(25.0)  # 1/4 * 100
+
