@@ -42,3 +42,9 @@ def add_config():
     if "intactness" not in config.sp:
         config.update_dict(config.sp, {"intactness": {"contents": "# HIV Sequence Intactness Statistics",
                                                      "num_lines": 10}})
+
+    if "barcode" not in config.sp:
+        config.update_dict(config.sp, {"barcode/extract": {"contents": "# Barcode extraction metrics",
+                                                          "num_lines": 10}})
+        config.update_dict(config.sp, {"barcode/correct": {"contents": "# Barcode correction metrics",
+                                                          "num_lines": 10}})

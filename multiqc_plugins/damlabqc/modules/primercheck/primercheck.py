@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import logging
 import yaml
 
@@ -18,13 +18,20 @@ class MultiqcModule(BaseMultiqcModule):
             info='analyzes primer amplification metrics.'
         )
 
-        # Initialize data storage
-        self.primercheck_data = dict()
+        # Initialize data storage with defaultdict for merging
+        self.primercheck_data = defaultdict(lambda: {
+            'total_sequences': 0,
+            'primer_hits': defaultdict(int),
+            'pairwise_hits': defaultdict(int)
+        })
         
         # Find and parse input files
         for f in self.find_log_files('primercheck'):
             self._parse_primercheck_yaml(f)
             
+        # Convert defaultdict to regular dict for downstream processing
+        self.primercheck_data = dict(self.primercheck_data)
+        
         # Filter out ignored samples
         self.primercheck_data = self.ignore_samples(self.primercheck_data)
 
@@ -32,7 +39,7 @@ class MultiqcModule(BaseMultiqcModule):
         if len(self.primercheck_data) == 0:
             raise ModuleNoSamplesFound
         
-        log.info(f"Found {len(self.primercheck_data)} reports")
+        log.info(f"Found {len(self.primercheck_data)} samples")
         
         # Write parsed data to file
         self.write_data_file(self.primercheck_data, 'multiqc_primercheck')
@@ -42,7 +49,7 @@ class MultiqcModule(BaseMultiqcModule):
         self._add_pairwise_plot()
     
     def _parse_primercheck_yaml(self, f):
-        """Parse primercheck YAML file."""
+        """Parse primercheck YAML file and merge with existing data if needed."""
         try:
             data = yaml.safe_load(f['f'])
             if data is None:
@@ -53,7 +60,21 @@ class MultiqcModule(BaseMultiqcModule):
             s_name = data.get('sample_name', f['s_name'].split('.')[0])
             s_name = self.clean_s_name(s_name, f)
             
-            self.primercheck_data[s_name] = data
+            # Merge data with existing sample data
+            sample_data = self.primercheck_data[s_name]
+            
+            # Add total sequences
+            sample_data['total_sequences'] += data['total_sequences']
+            
+            # Merge primer hits
+            for primer, hits in data['primer_hits'].items():
+                sample_data['primer_hits'][primer] += hits
+            
+            # Merge pairwise hits
+            for pair, hits in data['pairwise_hits'].items():
+                sample_data['pairwise_hits'][pair] += hits
+            
+            log.debug(f"Merged data for sample {s_name}")
             
         except Exception as e:
             log.warning(f"Error parsing file {f['fn']}: {e}")
@@ -85,8 +106,13 @@ class MultiqcModule(BaseMultiqcModule):
             'scale': 'Blues'
         }
         
+        # Get all unique primers across all samples
+        all_primers = set()
+        for d in self.primercheck_data.values():
+            all_primers.update(d['primer_hits'].keys())
+        
         # Add a column for each primer
-        for primer in self.primercheck_data[list(self.primercheck_data.keys())[0]]['primer_hits'].keys():
+        for primer in sorted(all_primers):
             headers[f'primer_{primer}'] = {
                 'title': f'{primer}',
                 'description': f'Hit rate for primer {primer}',
