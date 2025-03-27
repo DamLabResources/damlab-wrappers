@@ -1,0 +1,35 @@
+name: HuggingFace HIV-BERT
+description: |
+  A wrapper to run sequences through HuggingFace HIV-BERT models.
+  Takes FASTX or SAM/BAM files, translates sequences to amino acids,
+  and outputs predictions or embeddings based on the specified model.
+authors:
+  - Your Name
+input:
+  - FASTX or SAM/BAM file
+output:
+  - CSV file with model predictions or embeddings
+params:
+  model_name:
+    description: HuggingFace model name (e.g., damlab/hiv_bert)
+    required: true
+  mapped_only:
+    description: Process only mapped reads (for BAM/SAM files)
+    required: false
+    default: false
+  translate_frame:
+    description: Reading frame for translation (0, 1, 2)
+    required: false
+    default: 0
+  min_length:
+    description: Minimum amino acid sequence length
+    required: false
+    default: 10
+  max_length:
+    description: Maximum amino acid sequence length (for truncation)
+    required: false
+    default: 256
+  batch_size:
+    description: Batch size for processing sequences
+    required: false
+    default: 32 
