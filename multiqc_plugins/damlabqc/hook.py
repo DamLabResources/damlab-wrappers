@@ -48,3 +48,11 @@ def add_config():
                                                           "num_lines": 10}})
         config.update_dict(config.sp, {"barcode/correct": {"contents": "# Barcode correction metrics",
                                                           "num_lines": 10}})
+
+    if "hivbert" not in config.sp:
+        config.update_dict(config.sp, {"hivbert": {"contents": "# HIV-BERT Processing Metrics",
+                                                  "num_lines": 10}})
+
+    if "slice" not in config.sp:
+        config.update_dict(config.sp, {"slice": {"contents": "# Slice metrics",
+                                                  "num_lines": 10}})

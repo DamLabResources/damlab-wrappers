@@ -151,3 +151,92 @@ def test_intactness():
     assert float(sample3['intactness-percent_countable']) == pytest.approx(100.0)  # 4/4 * 100
     assert float(sample3['intactness-percent_intact']) == pytest.approx(25.0)  # 1/4 * 100
 
+
+def test_hivbert():
+    data = get_general_stats_data()
+    assert len(data) == 3
+
+    # Check that all expected columns are present
+    wanted_cols = [
+        "hivbert-total_sequences",
+        "hivbert-processed_sequences",
+        "hivbert-processed_rate"
+    ]
+    assert all(col in data[0] for col in wanted_cols)
+    
+    # Check sample1 data (3 sequences: 2 CCR5, 1 dual)
+    sample1 = next(row for row in data if row['Sample'] == 'sample1')
+    assert float(sample1['hivbert-total_sequences']) == 3
+    assert float(sample1['hivbert-processed_sequences']) == 3
+    assert float(sample1['hivbert-processed_rate']) == 1.0
+    
+    # Check sample2 data (3 sequences: 2 CXCR4, 1 CCR5)
+    sample2 = next(row for row in data if row['Sample'] == 'sample2')
+    assert float(sample2['hivbert-total_sequences']) == 3
+    assert float(sample2['hivbert-processed_sequences']) == 3
+    assert float(sample2['hivbert-processed_rate']) == 1.0
+    
+    # Check sample3 data (3 sequences: 2 dual, 1 CXCR4)
+    sample3 = next(row for row in data if row['Sample'] == 'sample3')
+    assert float(sample3['hivbert-total_sequences']) == 3
+    assert float(sample3['hivbert-processed_sequences']) == 3
+    assert float(sample3['hivbert-processed_rate']) == 1.0
+
+
+def test_hivbert_metrics_file():
+    """Test that metrics files contain expected values"""
+    import yaml
+    
+    # Check sample1 metrics
+    with open('build/hivbert/sample1.hivbert.yaml', 'r') as f:
+        metrics = yaml.safe_load(f)
+        assert metrics['model_name'] == 'damlab/HIV_V3_coreceptor'
+        assert metrics['model_type'] == 'classification'
+        assert metrics['total_sequences'] == 3
+        assert metrics['processed_sequences'] == 3
+        # Check high confidence counts
+        assert metrics['high_confidence_counts']['CCR5'] == 2  # 2 CCR5 sequences
+        assert metrics['high_confidence_counts']['CCR5+CXCR4'] == 1  # 1 dual tropic
+    
+    # Check sample2 metrics
+    with open('build/hivbert/sample2.hivbert.yaml', 'r') as f:
+        metrics = yaml.safe_load(f)
+        assert metrics['high_confidence_counts']['CXCR4'] == 2  # 2 CXCR4 sequences
+        assert metrics['high_confidence_counts']['CCR5'] == 1  # 1 CCR5 sequence
+    
+    # Check sample3 metrics
+    with open('build/hivbert/sample3.hivbert.yaml', 'r') as f:
+        metrics = yaml.safe_load(f)
+        assert metrics['high_confidence_counts']['CCR5+CXCR4'] == 2  # 2 dual tropic
+        assert metrics['high_confidence_counts']['CXCR4'] == 1  # 1 CXCR4 sequence
+
+
+def test_slice():
+    data = get_general_stats_data()
+    assert len(data) == 3
+
+    # Check that the wanted columns are present
+    wanted_cols = [
+        "slice-pct_overlapping",
+        "slice-overlapping",
+        "slice-total_segments"
+    ]
+    assert all(col in data[0] for col in wanted_cols)
+    
+    # Check sample1 data for gag region (100-200)
+    # In sample1, 5 out of 7 reads overlap this region
+    sample1 = next(row for row in data if row['Sample'] == 'sample1')
+    gag_pct = float(sample1['slice-pct_overlapping'])
+    assert pytest.approx(gag_pct, abs=1.0) == 71.4  # ~5/7 * 100 = 71.4%
+    
+    # Check sample2 data
+    # In sample2, 8 out of 9 reads overlap either gag or pol regions
+    sample2 = next(row for row in data if row['Sample'] == 'sample2')
+    assert float(sample2['slice-overlapping']) > 0
+    
+    # Check sample3 data
+    # In sample3, 3 reads overlap gag and 1 read overlaps pol
+    sample3 = next(row for row in data if row['Sample'] == 'sample3')
+    assert float(sample3['slice-overlapping']) > 0
+    assert float(sample3['slice-total_segments']) == 5
+
