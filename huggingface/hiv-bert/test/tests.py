@@ -64,3 +64,34 @@ def test_case_sensitivity():
     for col in prob_cols:
         assert abs(normal_pred[col] - mixed_pred[col]) < 0.01
 
+def test_metrics_output():
+    """Test metrics file format and content"""
+    # Test bodysite metrics
+    with open('aa_v3_metrics.yaml', 'r') as f:
+        metrics = yaml.safe_load(f)
+        
+        # Check structure
+        assert 'total_sequences' in metrics
+        assert 'processed_sequences' in metrics
+        assert 'mean_values' in metrics
+        assert 'high_confidence_counts' in metrics
+        assert 'model_name' in metrics
+        assert 'model_type' in metrics
+        assert 'parameters' in metrics
+        
+        # Check content
+        assert metrics['total_sequences'] > 0
+        assert metrics['processed_sequences'] > 0
+        assert metrics['model_type'] == 'classification'
+        
+        # Check mean values
+        for label in ['periphery-tcell', 'CNS', 'lung']:  # Example labels
+            assert label in metrics['mean_values']
+            assert 0 <= metrics['mean_values'][label] <= 1
+            
+        # Check high confidence counts
+        for label in ['periphery-tcell', 'CNS', 'lung']:
+            assert label in metrics['high_confidence_counts']
+            assert isinstance(metrics['high_confidence_counts'][label], int)
+            assert metrics['high_confidence_counts'][label] >= 0
+

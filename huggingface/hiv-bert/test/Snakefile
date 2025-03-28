@@ -15,14 +15,18 @@ rule test_aa_v3:
     input:
         'test_aa_v3.fasta'
     output:
-        'aa_v3_results.csv'
+        results = 'aa_v3_results.csv',
+        metrics = 'aa_v3_metrics.yaml'
     params:
         model_name = 'damlab/HIV_V3_bodysite',
         model_directory = 'model_cache',
         min_length = 10,
-        max_length = 256
+        max_length = 256,
+        sample_name = 'V3_Test_Sample'
     log:
-        'aa_v3.log'
+        stdout = 'logs/aa_v3.log'
+    conda:
+        'env.yaml'
     wrapper:
         "file:../"
 
@@ -37,7 +41,7 @@ rule test_dna_v3:
         min_length = 10,
         max_length = 256
     log:
-        'dna_v3.log'
+        stdout = 'logs/dna_v3.log'
     wrapper:
         "file:../"
 
@@ -52,7 +56,7 @@ rule test_proteins:
         min_length = 10,
         max_length = 256
     log:
-        'proteins.log'
+        stdout = 'logs/proteins.log'
     wrapper:
         "file:../"
 
@@ -67,6 +71,6 @@ rule test_edge_cases:
         min_length = 10,
         max_length = 256
     log:
-        'edge_cases.log'
+        stderr = 'logs/edge_cases.log'
     wrapper:
         "file:../" 

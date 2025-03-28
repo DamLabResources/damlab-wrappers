@@ -19,13 +19,16 @@ from contextlib import contextmanager
 from pathlib import Path
 import shutil
 from typing import Optional, Tuple, Dict, Any
+import yaml
 
 if "snakemake" not in locals():
     import snakemake  # type: ignore
 
-# Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Configure basic logging to stdout
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger('hiv-bert-wrapper')
 
 # HIV-BERT models
@@ -37,7 +40,7 @@ KNOWN_MODELS = {
                                        'breast-milk', 'female-genitals', 'male-genitals', 
                                        'gastric', 'lung', 'organ']},
     'damlab/HIV_V3_coreceptor': {'type': 'classification',
-                                'labels': ['CCR5', 'CXCR4', 'CCR5+CXCR4', 'neither']}
+                                'labels': ['CCR5', 'CXCR4']}
 }
 
 def translate_dna_to_aa(sequence, frame=0):
@@ -385,10 +388,61 @@ def create_empty_output(model_info, output_file):
     df.to_csv(output_file, index=False)
     logger.warning(f"No results to save. Created empty file: {output_file}")
 
+def generate_metrics(results: list, model_info: dict) -> dict:
+    """Generate metrics from processing results.
+    
+    Args:
+        results: List of dictionaries containing processing results
+        model_info: Dictionary containing model information
+        
+    Returns:
+        Dictionary of metrics
+    """
+    if not results:
+        return {
+            'total_sequences': 0,
+            'processed_sequences': 0,
+            'mean_values': {},
+            'high_confidence_counts': {}
+        }
+    
+    df = pd.DataFrame(results)
+    metrics = {
+        'total_sequences': len(results),
+        'processed_sequences': len(results)
+    }
+    
+    # Calculate metrics based on model type
+    if model_info['type'] == 'embedding':
+        # For embedding model, calculate mean of each dimension
+        embedding_cols = [col for col in df.columns if col.startswith('dim_')]
+        metrics['mean_values'] = {
+            col: float(df[col].mean()) 
+            for col in embedding_cols
+        }
+        # No high confidence counts for embeddings
+        metrics['high_confidence_counts'] = {}
+        
+    elif model_info['type'] == 'classification':
+        # For classification model, calculate mean probability for each class
+        prob_cols = [col for col in df.columns if col != 'id']
+        metrics['mean_values'] = {
+            col: float(df[col].mean()) 
+            for col in prob_cols
+        }
+        # Count sequences with high confidence (>= 0.5) for each class
+        metrics['high_confidence_counts'] = {
+            col: int(df[df[col] >= 0.5].shape[0])
+            for col in prob_cols
+        }
+    
+    return metrics
+
 def main():
     # Get input and output files
     input_file = str(snakemake.input[0])
     output_file = str(snakemake.output[0])
+    metrics_file = snakemake.output.get('metrics', None)  # Get optional metrics file
     
     # Get parameters with defaults
     model_name = snakemake.params.get('model_name', 'damlab/hiv_bert')
@@ -400,6 +454,7 @@ def main():
     min_length = snakemake.params.get('min_length', 10)
     max_length = snakemake.params.get('max_length', 256)
     batch_size = snakemake.params.get('batch_size', 32)
+    sample_name = snakemake.params.get('sample_name', None)  # Add sample_name parameter
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     
     params = {
@@ -415,34 +470,55 @@ def main():
     logger.info(f"Using model: {model_name}")
     logger.info(f"Parameters: {params}")
     
-    # Load model and tokenizer
-    model, tokenizer, model_info = load_model(model_name, model_directory)
-    model.to(device)
-    
-    # Detect file format
-    file_format = detect_file_format(input_file)
-    logger.info(f"Detected file format: {file_format}")
-    
-    # Select sequence generator based on file format
-    if file_format == 'fasta':
-        sequence_generator = yield_sequences_from_fasta(input_file, params)
-    elif file_format == 'fastq':
-        sequence_generator = yield_sequences_from_fastq(input_file, params)
-    elif file_format in ['bam', 'sam']:
-        sequence_generator = yield_sequences_from_bam(input_file, params)
-    else:
-        raise ValueError(f"Unsupported file format: {file_format}")
-    
-    # Process sequences
-    results = process_sequences(sequence_generator, model, tokenizer, model_info, params)
-    
-    # Save results to CSV
-    if results:
-        df = pd.DataFrame(results)
-        df.to_csv(output_file, index=False)
-        logger.info(f"Saved {len(results)} results to {output_file}")
-    else:
-        create_empty_output(model_info, output_file)
+    try:
+        # Load model and tokenizer
+        model, tokenizer, model_info = load_model(model_name, model_directory)
+        model.to(device)
+        
+        # Detect file format
+        file_format = detect_file_format(input_file)
+        logger.info(f"Detected file format: {file_format}")
+        
+        # Select sequence generator based on file format
+        if file_format == 'fasta':
+            sequence_generator = yield_sequences_from_fasta(input_file, params)
+        elif file_format == 'fastq':
+            sequence_generator = yield_sequences_from_fastq(input_file, params)
+        elif file_format in ['bam', 'sam']:
+            sequence_generator = yield_sequences_from_bam(input_file, params)
+        else:
+            raise ValueError(f"Unsupported file format: {file_format}")
+        
+        # Process sequences
+        results = process_sequences(sequence_generator, model, tokenizer, model_info, params)
+        
+        # Save results to CSV
+        if results:
+            df = pd.DataFrame(results)
+            df.to_csv(output_file, index=False)
+            logger.info(f"Saved {len(results)} results to {output_file}")
+        else:
+            create_empty_output(model_info, output_file)
+        
+        # Generate and save metrics if requested
+        if metrics_file:
+            metrics = generate_metrics(results, model_info)
+            # Add additional information to metrics
+            metrics['model_name'] = model_name
+            metrics['model_type'] = model_info['type']
+            metrics['input_file'] = input_file
+            metrics['parameters'] = params
+            if sample_name:  # Add sample name if provided
+                metrics['sample_name'] = sample_name
+            
+            with open(metrics_file, 'w') as f:
+                f.write("# HIV-BERT Processing Metrics\n")
+                yaml.dump(metrics, f, default_flow_style=False)
+            logger.info(f"Saved metrics to {metrics_file}")
+            
+    except Exception as e:
+        logger.error(f"Error processing file: {e}")
+        raise
 
 if __name__ == "__main__":
     main() 
