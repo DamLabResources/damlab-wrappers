@@ -1,6 +1,7 @@
 rule all:
     input:
-        'test_output.yaml'
+        'test_output.yaml',
+        'test_read_level.csv'
     conda: 'env.yaml'
     shell: "pytest tests.py"
 
@@ -8,7 +9,8 @@ rule test_deletion_frequency:
     input:
         'test.bam'
     output:
-        'test_output.yaml'
+        'test_output.yaml',
+        'test_read_level.csv'
     params:
         required_region = "HXB2F:1000-7000",
         deletion_region = "HXB2F:2100-2150",

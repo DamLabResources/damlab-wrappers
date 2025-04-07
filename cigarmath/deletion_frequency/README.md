@@ -11,6 +11,10 @@ A wrapper for calculating the frequency of reads containing deletions in specifi
   - reads_covering_required: Number of reads covering the required region
   - reads_with_deletion: Number of reads with deletion in specified region
   - deletion_frequency: Frequency of deletions in reads covering required region
+* Optional CSV file containing read-level information:
+  - read_name: Name of the read
+  - covers_required: Boolean (true/false) indicating if the read covers the required region
+  - has_deletion: Boolean (true/false) indicating if the read has a deletion in the specified region
 
 ## Parameters
 * `required_region` (required)
@@ -24,7 +28,8 @@ rule calculate_deletion_frequency:
     input:
         "sorted.bam"
     output:
-        "deletion_stats.yaml"
+        "deletion_stats.yaml",
+        "read_level_stats.csv"  # Optional CSV output
     params:
         required_region="chr1:1000-2000",
         deletion_region="chr1:1500-1600"
