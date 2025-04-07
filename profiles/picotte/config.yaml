@@ -1,0 +1,11 @@
+use-conda: true
+conda-prefix: '../../.snakemake/conda'
+cores: 1
+forceall: true
+config:
+  DORADO_MODELS_DIR: /home/wnd22/dorado_models
+default-resources:
+  slurm_account: wndfreeprj
+  slurm_partition: 'gpu-sm'
+  slurm_extra: "'--gres=gpu:1'"
+  

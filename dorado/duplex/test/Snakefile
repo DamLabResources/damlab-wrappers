@@ -19,7 +19,8 @@ rule test_duplex_single:
         temp('test.log')
     threads: 2
     params:
-        gpu = 'all'
+        gpu = 'all',
+        models_directory=config.get('DORADO_MODELS_DIR', '')
     wrapper:
         "file:../"
 
@@ -32,6 +33,7 @@ rule test_duplex_directory:
         temp('test_dir.log')
     threads: 2
     params:
-        gpu = 'all'
+        gpu = 'all',
+        models_directory=config.get('DORADO_MODELS_DIR', '')
     wrapper:
         "file:../"
