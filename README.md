@@ -90,7 +90,20 @@ This package contains wrappers for the Phylogenetic tree construction tools.
  - [`phylo/FastTree`](phylo/FastTree/README.md) : Fasttree phylogenetic tree construction tool.
  - [`phylo/phytreeviz`](phylo/phytreeviz/README.md) : Phytreeviz tool for visualizing phylogenetic trees.
  - [`phylo/reroot`](phylo/reroot/README.md) : Rerooting tool to reroot a tree using dendropy.
- 
+
+## Barcode and UMI
+
+This package contains wrappers for the barcode and UMI tools.
+
+ - [`barcode/extract`](barcode/extract/README.md) : Extract barcodes and UMIs from a BAM file.
+ - [`barcode/correct`](barcode/correct/README.md) : Correct barcodes in a BAM file.
+
+## Huggingface
+
+This package contains wrappers for various AI tools.
+
+ - [`huggingface/hiv-bert`](huggingface/hiv-bert/README.md) : Run HIV-BERT models on provided sequences.
+
 ## Visualization
 
 A collection of snakemake wrappers of Python APIs for visualization.

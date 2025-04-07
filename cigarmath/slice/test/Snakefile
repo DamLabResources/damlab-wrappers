@@ -1,0 +1,30 @@
+rule all:
+    input:
+        'test_output.fastq',
+        'test_metrics.yaml'
+    conda: 'env.yaml'
+    shell: "pytest -xvs tests.py"
+
+rule test_slice:
+    input:
+        'test.bam'
+    output:
+        fastq='test_output.fastq',
+        metrics='test_metrics.yaml'
+    params:
+        region='HXB2:110-130',
+        region_name='test_region',
+        sample_name='test_sample',
+        min_mapq=20
+    wrapper:
+        "file:../"
+
+rule make_test_bam:
+    input:
+        'test.sam'
+    output:
+        temp('test.bam')
+    params:
+        extra = '-n'
+    wrapper:
+        "v5.8.2/bio/samtools/sort" 

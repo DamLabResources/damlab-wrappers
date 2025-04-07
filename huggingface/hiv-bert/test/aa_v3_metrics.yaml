@@ -1,0 +1,33 @@
+# HIV-BERT Processing Metrics
+high_confidence_counts:
+  CNS: 1
+  breast-milk: 0
+  female-genitals: 0
+  gastric: 0
+  lung: 0
+  male-genitals: 0
+  organ: 1
+  periphery-monocyte: 0
+  periphery-tcell: 2
+input_file: test_aa_v3.fasta
+mean_values:
+  CNS: 0.2979802265763283
+  breast-milk: 0.03975545298308134
+  female-genitals: 0.10372783839702607
+  gastric: 0.15650251619517802
+  lung: 0.08970739934593439
+  male-genitals: 0.052758152782917025
+  organ: 0.16404296848922967
+  periphery-monocyte: 0.05899222530424595
+  periphery-tcell: 0.4386929661035538
+model_name: damlab/HIV_V3_bodysite
+model_type: classification
+parameters:
+  batch_size: 32
+  device: cuda
+  mapped_only: false
+  max_length: 256
+  min_length: 10
+  translate_frame: 0
+processed_sequences: 5
+total_sequences: 5

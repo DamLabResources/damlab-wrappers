@@ -1,0 +1,76 @@
+from os.path import join
+
+wd = workflow.basedir
+
+rule all:
+    input:
+        'aa_v3_results.csv',
+        'dna_v3_results.csv',
+        'protein_results.csv',
+        'edge_case_results.csv'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_aa_v3:
+    input:
+        'test_aa_v3.fasta'
+    output:
+        results = 'aa_v3_results.csv',
+        metrics = 'aa_v3_metrics.yaml'
+    params:
+        model_name = 'damlab/HIV_V3_bodysite',
+        model_directory = 'model_cache',
+        min_length = 10,
+        max_length = 256,
+        sample_name = 'V3_Test_Sample'
+    log:
+        stdout = 'logs/aa_v3.log'
+    conda:
+        'env.yaml'
+    wrapper:
+        "file:../"
+
+rule test_dna_v3:
+    input:
+        'test_dna_v3.fasta'
+    output:
+        'dna_v3_results.csv'
+    params:
+        model_name = 'damlab/HIV_V3_bodysite',
+        model_directory = 'model_cache',
+        min_length = 10,
+        max_length = 256
+    log:
+        stdout = 'logs/dna_v3.log'
+    wrapper:
+        "file:../"
+
+rule test_proteins:
+    input:
+        'test_aa_proteins.fasta'
+    output:
+        'protein_results.csv'
+    params:
+        model_name = 'damlab/hiv_bert',
+        model_directory = 'model_cache',
+        min_length = 10,
+        max_length = 256
+    log:
+        stdout = 'logs/proteins.log'
+    wrapper:
+        "file:../"
+
+rule test_edge_cases:
+    input:
+        'test_edge_cases.fasta'
+    output:
+        'edge_case_results.csv'
+    params:
+        model_name = 'damlab/HIV_V3_bodysite',
+        model_directory = 'model_cache',
+        min_length = 10,
+        max_length = 256
+    log:
+        stderr = 'logs/edge_cases.log'
+    wrapper:
+        "file:../" 

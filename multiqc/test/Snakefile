@@ -1,4 +1,7 @@
+from os.path import join
+
 SAMPLES = ["sample1", "sample2", "sample3"]
+REGIONS = ["gag", "pol"]
 
 
 rule all:
@@ -18,7 +21,10 @@ rule multiqc:
         expand("build/deletion_frequency/{sample}.p24.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/deletion_frequency/{sample}.vpr.deletion_frequency.yaml", sample=SAMPLES),
         expand("build/generic/{sample}.generic.yaml", sample=SAMPLES),
-        expand("build/primercheck/{sample}.primercheck.yaml", sample=SAMPLES)
+        expand("build/primercheck/{sample}.primercheck.yaml", sample=SAMPLES),
+        expand("build/hivbert/{sample}.hivbert.yaml", sample=SAMPLES),
+        expand("build/intactness/{sample}.intactness.yaml", sample=SAMPLES),
+        expand("build/slice/{sample}.{region}.metrics.yaml", sample=SAMPLES, region=REGIONS)
     output:
         report = "build/multiqc/multiqc_report.html",
         data = "build/multiqc/multiqc_report_data/multiqc_general_stats.txt"
@@ -27,6 +33,21 @@ rule multiqc:
         extra_args = "-v -f"
     wrapper:
         "file:../multiqc"
+
+rule hivbert_mqc:
+    input:
+        "data/{sample}_v3.fasta"
+    output:
+        results = "build/hivbert/{sample}.results.csv",
+        metrics = "build/hivbert/{sample}.hivbert.yaml"
+    params:
+        model_name = "damlab/HIV_V3_coreceptor",
+        model_directory = "model_cache",
+        sample_name = lambda wildcards: wildcards.sample
+    log:
+        "build/hivbert/{sample}.log"
+    wrapper:
+        "file:../../huggingface/hiv-bert"
 
 rule strainline_mqc:
     input:
@@ -141,4 +162,56 @@ rule primercheck_mqc:
         "build/primercheck/{sample}.log"
     wrapper:
         "file:../../seqkit/primercheck"
+
+rule intactness_mqc:
+    input:
+        "intactness/{sample}.fasta"
+    output:
+        "build/intactness/{sample}.intactness.yaml"
+    params:
+        min_countable=50,
+        max_countable=80,
+        min_intact=70,
+        max_intact=75,
+        sample_name=lambda wildcards: wildcards.sample
+    wrapper:
+        "file:../../hiv/intactness"
+
+# New rules for slice testing
+
+rule convert_sam_to_bam:
+    input:
+        "data/slice/{sample}.sam"
+    output:
+        temp("build/slice/{sample}.bam")
+    wrapper:
+        "v5.8.0/bio/samtools/view"
+
+rule slice_gag_region:
+    input:
+        "build/slice/{sample}.bam"
+    output:
+        fastq="build/slice/{sample}.gag.fastq",
+        metrics="build/slice/{sample}.gag.metrics.yaml"
+    params:
+        region="HXB2:100-200",
+        region_name="gag",
+        sample_name=lambda wildcards: wildcards.sample,
+        min_mapq=20
+    wrapper:
+        "file:../../cigarmath/slice"
+
+rule slice_pol_region:
+    input:
+        "build/slice/{sample}.bam"
+    output:
+        fastq="build/slice/{sample}.pol.fastq",
+        metrics="build/slice/{sample}.pol.metrics.yaml"
+    params:
+        region="HXB2:200-300",
+        region_name="pol",
+        sample_name=lambda wildcards: wildcards.sample,
+        min_mapq=20
+    wrapper:
+        "file:../../cigarmath/slice"
     

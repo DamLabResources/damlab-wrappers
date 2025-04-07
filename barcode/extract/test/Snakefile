@@ -1,0 +1,17 @@
+rule all:
+    input:
+        'test_output.bam'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_extract_barcodes:
+    input:
+        'test.bam'
+    output:
+        'test_output.bam'
+    params:
+        builtin='SIVmac239m2',
+        barcode_tag='CR',
+        umi_tag='OX'
+    wrapper:
+        "file:../" 

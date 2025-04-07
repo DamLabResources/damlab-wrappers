@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python>=3.8
+  - pysam
+  - biopython
+  - pandas
+  - pip
+  - pip:
+    - transformers>=4.25.1
+    - torch>=1.13.1
+    - sentencepiece
+    - protobuf 
