@@ -139,4 +139,45 @@ Will Dampier (wnd22@drexel.edu)
 
 ## License
 
-MIT 
+MIT
+
+## Building the Environment on GPU Nodes
+
+This wrapper requires PyTorch with CUDA support, which can only be built on nodes with GPU access. The included makefiles use `srun` to build the environment on a GPU node.
+
+### Main Wrapper
+
+To build the main wrapper environment:
+
+```bash
+cd damlab-wrappers/huggingface/hiv-bert
+make
+```
+
+This will create a virtual environment in the `venv` directory using the `environment.picotte.yaml` file.
+
+### Test Environment
+
+To build and run the tests:
+
+```bash
+cd damlab-wrappers/huggingface/hiv-bert/test
+make
+make test
+```
+
+This will create a virtual environment in the `venv` directory and run the tests using the GPU.
+
+### Cleaning Up
+
+To clean up the environments:
+
+```bash
+# For the main wrapper
+cd damlab-wrappers/huggingface/hiv-bert
+make clean
+
+# For the tests
+cd damlab-wrappers/huggingface/hiv-bert/test
+make clean
+``` 
