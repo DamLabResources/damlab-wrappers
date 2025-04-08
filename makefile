@@ -32,7 +32,7 @@ very_clean:
 	find . -type d -name "venv" -exec rm -rf {} +
 
 venv:
-	mamba env create -f environment.yml --prefix venv
+	mamba env create -f environment.yaml --prefix ./venv
 
 strainline/venv:
 	cd strainline
