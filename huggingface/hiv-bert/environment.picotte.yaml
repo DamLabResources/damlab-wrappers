@@ -1,9 +1,10 @@
 channels:
+  - pytorch
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - python>=3.8
+  - python=3.11
   - pysam
   - biopython
   - pandas
@@ -11,8 +12,9 @@ dependencies:
   - numpy
   - pyyaml
   - pip
+  - pytorch=1.12.1
+  - cudatoolkit=11.6
   - pip:
     - transformers>=4.36.0
-    - torch>=1.13.1
     - sentencepiece
     - protobuf 

@@ -9,23 +9,36 @@ import os
 import sys
 import logging
 
-# Ensure we're using the conda environment's Python
-if 'CONDA_PREFIX' in os.environ:
-    conda_prefix = os.environ['CONDA_PREFIX']
-    if conda_prefix not in sys.path:
-        sys.path.insert(0, conda_prefix)
-        # Also add the site-packages directory
-        site_packages = os.path.join(conda_prefix, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
-        if site_packages not in sys.path:
-            sys.path.insert(0, site_packages)
+# Configure basic logging to stdout
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('hiv-bert-wrapper')
+
+# Check if we need to use a custom environment
+if "snakemake" in locals():
+    custom_env = snakemake.params.get('custom_env', None)
+    if custom_env:
+        logger.info(f"Using custom environment: {custom_env}")
+        # Add the custom environment to the Python path
+        if os.path.exists(custom_env):
+            if custom_env not in sys.path:
+                sys.path.insert(0, custom_env)
+            # Also add the site-packages directory
+            site_packages = os.path.join(custom_env, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
+            if os.path.exists(site_packages) and site_packages not in sys.path:
+                sys.path.insert(0, site_packages)
+        else:
+            logger.warning(f"Custom environment path does not exist: {custom_env}")
 
 import pandas as pd
 import numpy as np
 from Bio import SeqIO, Seq
 from Bio.Data import CodonTable
 import pysam
-from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification, pipeline
 import torch
+from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification, pipeline
 from contextlib import contextmanager
 from pathlib import Path
 import shutil
@@ -35,12 +48,15 @@ import yaml
 if "snakemake" not in locals():
     import snakemake  # type: ignore
 
-# Configure basic logging to stdout
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger('hiv-bert-wrapper')
+# Log CUDA information
+logger.info(f"PyTorch version: {torch.__version__}")
+logger.info(f"CUDA available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    logger.info(f"CUDA version: {torch.version.cuda}")
+    logger.info(f"GPU device: {torch.cuda.get_device_name(0)}")
+    logger.info(f"GPU count: {torch.cuda.device_count()}")
+else:
+    logger.warning("CUDA is not available. Using CPU for inference.")
 
 # HIV-BERT models
 KNOWN_MODELS = {
@@ -466,7 +482,18 @@ def main():
     max_length = snakemake.params.get('max_length', 256)
     batch_size = snakemake.params.get('batch_size', 32)
     sample_name = snakemake.params.get('sample_name', None)  # Add sample_name parameter
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
+    # Determine device to use
+    force_cpu = snakemake.params.get('force_cpu', False)
+    if force_cpu:
+        device = 'cpu'
+        logger.info("Forcing CPU mode as requested")
+    else:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        if device == 'cuda':
+            logger.info(f"Using GPU: {torch.cuda.get_device_name(0)}")
+        else:
+            logger.warning("CUDA not available, falling back to CPU")
     
     params = {
         'mapped_only': mapped_only,

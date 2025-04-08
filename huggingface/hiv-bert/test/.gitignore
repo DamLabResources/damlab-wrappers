@@ -1,1 +1,18 @@
-model_cache
+# Build directory
+.build/
+
+# Logs
+logs/
+
+# Model cache
+model_cache/
+
+# Test results
+*.csv
+*.yaml
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class

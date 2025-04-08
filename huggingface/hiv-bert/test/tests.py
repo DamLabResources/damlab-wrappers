@@ -3,17 +3,20 @@ import os
 import pandas as pd
 import yaml
 
+# Define build directory path
+BUILD_DIR = os.path.join(os.path.dirname(__file__), '.build')
+
 def test_output_exists():
     """Test that output files exist"""
-    assert os.path.exists('aa_v3_results.csv')
-    assert os.path.exists('dna_v3_results.csv')
-    assert os.path.exists('protein_results.csv')
-    assert os.path.exists('edge_case_results.csv')
+    assert os.path.exists(os.path.join(BUILD_DIR, 'aa_v3_results.csv'))
+    assert os.path.exists(os.path.join(BUILD_DIR, 'dna_v3_results.csv'))
+    assert os.path.exists(os.path.join(BUILD_DIR, 'protein_results.csv'))
+    assert os.path.exists(os.path.join(BUILD_DIR, 'edge_case_results.csv'))
 
 def test_v3_sequence_detection():
     """Test that V3 sequences are processed correctly regardless of input type"""
-    aa_df = pd.read_csv('aa_v3_results.csv')
-    dna_df = pd.read_csv('dna_v3_results.csv')
+    aa_df = pd.read_csv(os.path.join(BUILD_DIR, 'aa_v3_results.csv'))
+    dna_df = pd.read_csv(os.path.join(BUILD_DIR, 'dna_v3_results.csv'))
     
     # Get predictions for equivalent sequences
     aa_pred = aa_df[aa_df['id'] == 'V3_example'].iloc[0]
@@ -26,7 +29,7 @@ def test_v3_sequence_detection():
 
 def test_protein_processing():
     """Test processing of protein sequences"""
-    df = pd.read_csv('protein_results.csv')
+    df = pd.read_csv(os.path.join(BUILD_DIR, 'protein_results.csv'))
     
     # Check that protein sequences are present
     assert 'Tat_example' in df['id'].values
@@ -40,7 +43,7 @@ def test_protein_processing():
 
 def test_edge_cases():
     """Test handling of edge cases"""
-    df = pd.read_csv('edge_case_results.csv')
+    df = pd.read_csv(os.path.join(BUILD_DIR, 'edge_case_results.csv'))
     
     # Short sequence should be filtered out
     assert 'AA_short' not in df['id'].values
@@ -53,7 +56,7 @@ def test_edge_cases():
 
 def test_case_sensitivity():
     """Test that case doesn't affect predictions"""
-    df = pd.read_csv('dna_v3_results.csv')
+    df = pd.read_csv(os.path.join(BUILD_DIR, 'dna_v3_results.csv'))
     
     # Get predictions for normal and mixed case sequences
     normal_pred = df[df['id'] == 'V3_Tcell_DNA_frame0'].iloc[0]
@@ -67,7 +70,7 @@ def test_case_sensitivity():
 def test_metrics_output():
     """Test metrics file format and content"""
     # Test bodysite metrics
-    with open('aa_v3_metrics.yaml', 'r') as f:
+    with open(os.path.join(BUILD_DIR, 'aa_v3_metrics.yaml'), 'r') as f:
         metrics = yaml.safe_load(f)
         
         # Check structure
