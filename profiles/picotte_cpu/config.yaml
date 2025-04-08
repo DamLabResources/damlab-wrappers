@@ -1,0 +1,13 @@
+use-conda: true
+executor: slurm
+jobs: 5
+conda-prefix: '../../.snakemake/conda'
+cores: 1
+forceall: true
+config:
+  DORADO_MODELS_DIR: /home/wnd22/dorado_models
+default-resources:
+  slurm_account: wndprj
+  slurm_partition: 'def'
+  runtime: 15
+  
