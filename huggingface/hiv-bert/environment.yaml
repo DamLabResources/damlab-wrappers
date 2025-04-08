@@ -3,13 +3,16 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python>=3.8
+  - python=3.11
   - pysam
   - biopython
   - pandas
+  - pillow
+  - numpy
+  - pyyaml
   - pip
   - pip:
-    - transformers>=4.25.1
+    - transformers>=4.36.0
     - torch>=1.13.1
     - sentencepiece
     - protobuf 

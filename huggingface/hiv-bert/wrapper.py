@@ -8,6 +8,17 @@ __license__ = "MIT"
 import os
 import sys
 import logging
+
+# Ensure we're using the conda environment's Python
+if 'CONDA_PREFIX' in os.environ:
+    conda_prefix = os.environ['CONDA_PREFIX']
+    if conda_prefix not in sys.path:
+        sys.path.insert(0, conda_prefix)
+        # Also add the site-packages directory
+        site_packages = os.path.join(conda_prefix, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
+        if site_packages not in sys.path:
+            sys.path.insert(0, site_packages)
+
 import pandas as pd
 import numpy as np
 from Bio import SeqIO, Seq

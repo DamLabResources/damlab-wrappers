@@ -30,4 +30,5 @@ parameters:
   min_length: 10
   translate_frame: 0
 processed_sequences: 5
+sample_name: V3_Test_Sample
 total_sequences: 5
