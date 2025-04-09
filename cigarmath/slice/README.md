@@ -1,27 +1,21 @@
 # Sequence Region Slicer
 
-A wrapper for extracting sequences from aligned reads that overlap a specified genomic region.
+A wrapper for extracting sequences from aligned reads that overlap a specified genomic region. This wrapper uses the cigarmath library to accurately slice sequences based on CIGAR strings.
 
-## Input
-* BAM file containing aligned reads (coordinate sorted recommended for performance)
+## Version
 
-## Output
-* FASTQ file containing sliced sequences from the specified region
-* Optional YAML metrics file with statistics about the extraction process
+Current version: 1.0.0 (First stable release)
 
-## Parameters
-* `region` (required)
-    Region to extract sequences from (format: "chr:start-end" or just "chr" for the entire chromosome)
-* `region_name` (optional, default: same as region)
-    A user-friendly name for the region, used in read names and metrics
-* `sample_name` (optional, default: "")
-    Sample name to include in metrics
-* `min_mapq` (optional, default: 0)
-    Minimum mapping quality for reads to include
-* `append_region_to_read_id` (optional, default: false)
-    Whether to append region information to read IDs in the output FASTQ
+For a detailed list of changes, see the [CHANGELOG.md](CHANGELOG.md).
 
-## Example
+## Installation
+
+```bash
+conda env create -f environment.yaml
+```
+
+## Usage
+
 ```python
 rule slice_region:
     input:
@@ -39,22 +33,47 @@ rule slice_region:
         "file:path/to/damlab-wrappers/cigarmath/slice"
 ```
 
+## Parameters
+
+- `region` (str, required): Region to extract sequences from (format: "chr:start-end" or just "chr" for the entire chromosome)
+- `region_name` (str, optional): A user-friendly name for the region, used in read names and metrics. Defaults to the same as region.
+- `sample_name` (str, optional): Sample name to include in metrics. Defaults to an empty string.
+- `min_mapq` (int, optional): Minimum mapping quality for reads to include. Defaults to 0.
+- `append_region_to_read_id` (bool, optional): Whether to append region information to read IDs in the output FASTQ. Defaults to False.
+
+## Input
+* BAM file containing aligned reads (coordinate sorted recommended for performance)
+
+## Output
+* FASTQ file containing sliced sequences from the specified region
+* YAML metrics file (optional) with statistics about the extraction process, including:
+  - Region information
+  - Sample name
+  - Total segments processed
+  - Segments overlapping the region
+  - Whether BAM index was used
+  - Whether region information was appended to read IDs
+
 ## Output Format
 The output FASTQ file contains sequences extracted from the specified region, with read names formatted as:
 - If `append_region_to_read_id` is True: `{original_read_name}_{region_name}_{chr}:{start}-{end}`
 - If `append_region_to_read_id` is False: `{original_read_name}`
 
-The metrics YAML file contains:
-- region: The input region string
-- region_name: The name of the region
-- sample_name: The name of the sample
-- total_segments_processed: Number of aligned segments processed from the BAM file
-- segments_overlapping_region: Number of segments that overlapped the specified region
-- append_region_to_read_id: Whether region information was appended to read IDs
+## Error Handling
+
+The wrapper includes error handling for:
+- Invalid region formats
+- Missing BAM index files
+- Invalid CIGAR strings
+- Sequence extraction errors
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Authors
 * Will Dampier, PhD
 
 ## Software Requirements
-* [pysam](https://pysam.readthedocs.io/)
-* [cigarmath](https://github.com/DamLabResources/cigarmath) 
+* [pysam](https://pysam.readthedocs.io/) (tested with v0.19.0)
+* [cigarmath](https://github.com/DamLabResources/cigarmath) (tested with v0.1.0) 
