@@ -8,13 +8,9 @@ Current version: 1.0.0 (First stable release)
 
 For a detailed list of changes, see the [CHANGELOG.md](CHANGELOG.md).
 
-## Installation
-
-```bash
-pip install biopython
-```
-
 ## Usage
+
+For general information on how to use wrappers in Snakemake, please refer to the [root README.md](../../../README.md).
 
 ```python
 from wrapper import translate_sequence
