@@ -4,6 +4,7 @@ __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
 from snakemake.shell import shell # type: ignore
 import shlex
