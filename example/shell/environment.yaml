@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python>=3.10
+  - seqkit>=0.16.1
+  - snakemake-wrapper-utils>=0.3 

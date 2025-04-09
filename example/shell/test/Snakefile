@@ -1,0 +1,52 @@
+from os.path import join
+
+# Create test output directory
+import os
+os.makedirs("test_output", exist_ok=True)
+
+rule all:
+    input:
+        "test_output/basic.fasta",
+        "test_output/frame1.fasta",
+        "test_output/table2.fasta"
+    conda: "env.yaml"
+    shell: "pytest tests.py"
+
+# Test with basic parameters
+rule test_basic:
+    input:
+        "test_data.fasta"
+    output:
+        "test_output/basic.fasta"
+    params:
+        frame=0,
+        table=1,
+        trim=False
+    wrapper:
+        "file:../"
+
+# Test with frame 1
+rule test_frame1:
+    input:
+        "test_data.fasta"
+    output:
+        "test_output/frame1.fasta"
+    params:
+        frame=1,
+        table=1,
+        trim=False
+    wrapper:
+        "file:../"
+
+# Test with table 2 (vertebrate mitochondrial)
+rule test_table2:
+    input:
+        "test_data.fasta"
+    output:
+        "test_output/table2.fasta"
+    params:
+        frame=0,
+        table=2,
+        trim=False
+    wrapper:
+        "file:../" 
