@@ -1,0 +1,62 @@
+from os.path import join
+
+# Create test output directory
+import os
+os.makedirs("test_output", exist_ok=True)
+
+rule all:
+    input:
+        "test_output/inner_merge.csv",
+        "test_output/outer_merge.csv",
+        "test_output/no_on_merge.csv",
+        "test_output/three_file_merge.csv"
+    conda: "env.yaml"
+    shell: "pytest tests.py"
+
+# Test with inner merge
+rule test_inner_merge:
+    input:
+        csv_files=["test_data1.csv", "test_data2.csv"]
+    output:
+        "test_output/inner_merge.csv"
+    params:
+        on="id",
+        how="inner"
+    wrapper:
+        "file:../"
+
+# Test with outer merge
+rule test_outer_merge:
+    input:
+        csv_files=["test_data1.csv", "test_data2.csv"]
+    output:
+        "test_output/outer_merge.csv"
+    params:
+        on="id",
+        how="outer"
+    wrapper:
+        "file:../"
+
+# Test without specifying 'on' parameter
+rule test_no_on_merge:
+    input:
+        csv_files=["test_data1.csv", "test_data2.csv"]
+    output:
+        "test_output/no_on_merge.csv"
+    params:
+        how="outer"
+    wrapper:
+        "file:../"
+
+# Test with three files and suffixes
+rule test_three_file_merge:
+    input:
+        csv_files=["test_data1.csv", "test_data2.csv", "test_data3.csv"]
+    output:
+        "test_output/three_file_merge.csv"
+    params:
+        on="id",
+        how="outer",
+        suffixes=("_first", "_second", "_third")
+    wrapper:
+        "file:../" 
