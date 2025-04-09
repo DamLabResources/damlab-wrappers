@@ -4,6 +4,7 @@ __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
 import pysam
 import regex
@@ -66,7 +67,7 @@ def make_new_bamfile(insam, outpath):
         header['PG'].append({
             'ID': 'barcode_extract',
             'PN': 'damlab-barcode-extract',
-            'VN': '0.0.1',
+            'VN': __version__,
             'DS': 'Extract barcodes and UMIs from sequence reads'
         })
         

@@ -4,6 +4,7 @@ __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
 import pysam
 from contextlib import contextmanager
@@ -28,7 +29,7 @@ def make_new_bamfile(insam, outpath):
         header['PG'].append({
             'ID': 'barcode_correct',
             'PN': 'damlab-barcode-correct',
-            'VN': '0.0.1',
+            'VN': __version__,
             'DS': 'Correct barcodes using UMI-tools clustering'
         })
         
