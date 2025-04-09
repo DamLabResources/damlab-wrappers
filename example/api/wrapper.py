@@ -4,6 +4,7 @@ __author__ = "Example Author"
 __copyright__ = "Copyright 2024"
 __email__ = "example@example.com"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
 import os
 from Bio import SeqIO
@@ -15,6 +16,12 @@ from Bio.Data import CodonTable
 # This is useful for testing and linting
 if "snakemake" not in locals():
     import snakemake  # type: ignore
+
+# Check if version is specified and compatible
+if hasattr(snakemake, "params") and "version" in snakemake.params:
+    requested_version = snakemake.params.version
+    if requested_version != __version__:
+        print(f"Warning: Requested version {requested_version} does not match wrapper version {__version__}")
 
 # Get input and output files
 input_file = snakemake.input[0]

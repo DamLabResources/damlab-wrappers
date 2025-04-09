@@ -1,5 +1,7 @@
 # SeqKit Translate Wrapper
 
+Version: 1.0.0
+
 This wrapper demonstrates how to create a Snakemake wrapper for a shell command. It wraps the `seqkit translate` command, which translates DNA/RNA sequences to protein sequences.
 
 ## Input

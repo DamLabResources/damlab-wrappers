@@ -1,24 +1,69 @@
-# Biopython Translate Wrapper
+# Biopython Translation Wrapper
 
-This wrapper demonstrates how to create a Snakemake wrapper for a Python API. It wraps the Biopython `Seq.translate()` method to translate DNA/RNA sequences to protein sequences.
+A wrapper for Biopython's translation functionality, providing a simple interface for translating DNA/RNA sequences to protein sequences.
+
+## Version
+
+Current version: 1.0.0 (First stable release)
+
+For a detailed list of changes, see the [CHANGELOG.md](CHANGELOG.md).
+
+## Installation
+
+```bash
+pip install biopython
+```
+
+## Usage
+
+```python
+from wrapper import translate_sequence
+
+# Basic usage
+result = translate_sequence("ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG")
+
+# With custom parameters
+result = translate_sequence(
+    "ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG",
+    frame=1,
+    table=1,
+    stop_symbol="*",
+    to_stop=False,
+    cds=False
+)
+```
+
+## Parameters
+
+- `sequence` (str): The DNA/RNA sequence to translate
+- `frame` (int, optional): Reading frame (0, 1, or 2). Defaults to 0.
+- `table` (int, optional): Translation table number. Defaults to 1 (standard).
+- `stop_symbol` (str, optional): Symbol used for stop codons. Defaults to "*".
+- `to_stop` (bool, optional): Whether to translate only up to the first stop codon. Defaults to False.
+- `cds` (bool, optional): Whether to treat the sequence as a complete CDS. Defaults to False.
+
+## Returns
+
+- `str`: The translated protein sequence
+
+## Error Handling
+
+The wrapper includes comprehensive error handling for:
+- Invalid sequences
+- Invalid frame values
+- Invalid translation table numbers
+- Invalid stop symbols
+- Translation errors
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Input
 * FASTA/FASTQ file containing DNA/RNA sequences
 
 ## Output
 * FASTA file containing translated protein sequences
-
-## Parameters
-* `frame` (optional, default: 0)
-    Reading frame for translation (0, 1, or 2)
-* `table` (optional, default: 1)
-    Translation table number (1-16)
-* `stop_symbol` (optional, default: "*")
-    Symbol to use for stop codons
-* `to_stop` (optional, default: false)
-    Whether to translate to the first stop codon
-* `cds` (optional, default: false)
-    Whether the sequence is a complete CDS
 
 ## Example
 ```python

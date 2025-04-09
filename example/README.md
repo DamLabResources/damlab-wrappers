@@ -26,9 +26,10 @@ All wrappers follow a consistent directory structure:
 
 ```
 wrapper_name/
-├── environment.yaml      # Conda environment definition
+├── environment.yaml       # Conda environment definition
 ├── README.md             # Documentation
 ├── wrapper.py            # Main wrapper script
+├── CHANGELOG.md          # Version history and changes
 └── test/                 # Test directory
     ├── env.yaml          # Test environment
     ├── Snakefile         # Test workflow
@@ -101,6 +102,31 @@ The main wrapper script that executes the tool:
 - For shell wrappers: Uses `snakemake.shell` to execute commands
 - For API wrappers: Uses Python libraries directly to process data
 
+#### CHANGELOG.md
+
+Documents version history and changes:
+
+```markdown
+# Changelog
+
+## [1.2.3] - 2023-04-09
+### Fixed
+- Bug in parameter handling
+
+## [1.2.0] - 2023-03-15
+### Added
+- New optional parameter `param2`
+
+## [1.1.0] - 2023-02-01
+### Added
+- Support for new input format
+- Improved algorithm performance
+
+## [1.0.0] - 2023-01-01
+### Added
+- Initial release
+```
+
 #### test/
 
 Contains tests to verify the wrapper works correctly:
@@ -109,6 +135,56 @@ Contains tests to verify the wrapper works correctly:
 - `Snakefile`: Test workflow that runs the wrapper with different parameters
 - `tests.py`: Test script that verifies outputs
 - `test_data.*`: Sample data files for testing
+
+## Versioning Wrappers
+
+Wrappers should follow semantic versioning (MAJOR.MINOR.PATCH) to ensure reproducibility and compatibility:
+
+### Version Number Format: MAJOR.MINOR.PATCH
+
+- **MAJOR**: Breaking changes that affect input/output formats or metrics
+- **MINOR**: New features or parameters that maintain backward compatibility
+- **PATCH**: Bug fixes and minor improvements
+
+### Implementation
+
+1. **Version in wrapper.py**:
+   ```python
+   __version__ = "1.2.3"
+   ```
+
+2. **Version in README.md**:
+   ```markdown
+   Version: 1.2.3
+   ```
+
+3. **CHANGELOG.md**:
+   Document all changes between versions
+
+4. **Git Tags**:
+   Tag each release with the version number
+
+### Versioning Guidelines
+
+- **MAJOR Version (1.0.0 → 2.0.0)**: Increment when input/output formats change
+- **MINOR Version (1.0.0 → 1.1.0)**: Increment when new optional parameters are added
+- **PATCH Version (1.0.0 → 1.0.1)**: Increment when bug fixes are made
+
+### Version Specification in Workflows
+
+When using wrappers in workflows, specify the version explicitly:
+
+```python
+rule example:
+    input:
+        "input.fasta"
+    output:
+        "output.fasta"
+    params:
+        param1="value"
+    wrapper:
+        "file:path/to/wrapper@1.2.3"  # Specify version
+```
 
 ## Creating a New Wrapper
 
@@ -124,6 +200,7 @@ mkdir -p wrapper_name/test
 touch wrapper_name/environment.yaml
 touch wrapper_name/README.md
 touch wrapper_name/wrapper.py
+touch wrapper_name/CHANGELOG.md
 touch wrapper_name/test/env.yaml
 touch wrapper_name/test/Snakefile
 touch wrapper_name/test/tests.py
@@ -170,6 +247,7 @@ rule example:
 4. **Write Tests**: Create comprehensive tests for all functionality
 5. **Handle Errors**: Implement proper error handling and logging
 6. **Follow Conventions**: Adhere to the established wrapper structure and conventions
+7. **Version Wrappers**: Use semantic versioning for wrappers
 
 ## Resources
 
@@ -177,6 +255,7 @@ rule example:
 - [Snakemake Wrapper Repository](https://github.com/snakemake/snakemake-wrappers)
 - [Conda Documentation](https://docs.conda.io/)
 - [Bioconda Documentation](https://bioconda.github.io/)
+- [Semantic Versioning](https://semver.org/)
 
 ## Example Wrappers
 
