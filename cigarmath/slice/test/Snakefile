@@ -15,7 +15,8 @@ rule test_slice:
         region='HXB2:110-130',
         region_name='test_region',
         sample_name='test_sample',
-        min_mapq=20
+        min_mapq=20,
+        append_region_to_read_id=False
     wrapper:
         "file:../"
 

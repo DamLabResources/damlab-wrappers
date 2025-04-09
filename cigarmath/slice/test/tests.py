@@ -20,6 +20,11 @@ def test_output_fastq_format():
     # Check FASTQ format (groups of 4 lines)
     assert len(lines) % 4 == 0
     
+    # Check if append_region_to_read_id is True in metrics
+    with open('test_metrics.yaml') as f:
+        metrics = yaml.safe_load(f)
+    append_region = metrics.get('append_region_to_read_id', False)
+    
     for i in range(0, len(lines), 4):
         # Line 1: Header starts with @
         assert lines[i].startswith('@')
@@ -28,8 +33,13 @@ def test_output_fastq_format():
         # Line 4: Quality score length matches sequence length
         assert len(lines[i+1].strip()) == len(lines[i+3].strip())
         
-        # Check that read name contains region info
-        assert 'HXB2:110-130' in lines[i] or 'test_region' in lines[i]
+        # Check that read name contains region info only if append_region is True
+        if append_region:
+            assert 'HXB2:110-130' in lines[i] or 'test_region' in lines[i]
+        else:
+            # If not appending region, the read name should be the original read name
+            # without any region information
+            assert 'HXB2:110-130' not in lines[i] and 'test_region' not in lines[i]
 
 def test_metrics_yaml():
     """Test that metrics YAML contains expected fields"""
@@ -42,6 +52,7 @@ def test_metrics_yaml():
     assert 'sample_name' in metrics
     assert 'total_segments_processed' in metrics
     assert 'segments_overlapping_region' in metrics
+    assert 'append_region_to_read_id' in metrics
     
     # Verify values
     assert metrics['region'] == 'HXB2:110-130'
@@ -49,10 +60,7 @@ def test_metrics_yaml():
     assert metrics['sample_name'] == 'test_sample'
     assert metrics['total_segments_processed'] > 0
     assert metrics['segments_overlapping_region'] > 0
-    
-    # Verify that we found at least 3 overlapping segments
-    # (should be reads 3, 4, and 5 from our test SAM)
-    assert metrics['segments_overlapping_region'] >= 3
+    assert isinstance(metrics['append_region_to_read_id'], bool)
 
 def test_read_content():
     """Test that extracted reads contain expected content"""

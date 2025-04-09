@@ -66,6 +66,7 @@ chrom, region_start, region_end = parse_region(region)
 region_name = snakemake.params.get("region_name", region)
 sample_name = snakemake.params.get("sample_name", "")
 min_mapq = snakemake.params.get("min_mapq", 0)
+append_region_to_read_id = snakemake.params.get("append_region_to_read_id", False)
 
 # Initialize counters for metrics
 metrics = {
@@ -74,7 +75,8 @@ metrics = {
     "sample_name": sample_name,
     "total_segments_processed": 0,
     "segments_overlapping_region": 0,
-    "used_index": check_bam_index(input_bam)
+    "used_index": check_bam_index(input_bam),
+    "append_region_to_read_id": append_region_to_read_id
 }
 
 # Stream segments from BAM file
@@ -158,7 +160,10 @@ with open(output_fastq, 'w') as fastq_out:
             quality = '!' * len(sequence)  # Default to lowest quality if not available
         
         # Create read name with region information
-        read_name = f"{segment.query_name}_{region_name}_{chrom}:{region_start}-{region_end}"
+        if append_region_to_read_id:
+            read_name = f"{segment.query_name}_{region_name}_{chrom}:{region_start}-{region_end}"
+        else:
+            read_name = segment.query_name
         
         # Write FASTQ entry
         fastq_out.write(f"@{read_name}\n")
