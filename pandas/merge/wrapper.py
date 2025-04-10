@@ -4,11 +4,12 @@ __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.1.0"
 
 import pandas as pd
 import yaml
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union, Tuple
 from pathlib import Path
 
 # Configure basic logging to stdout
@@ -22,14 +23,21 @@ if "snakemake" not in locals():
     import snakemake  # type: ignore
 
 def merge_csv_files(input_files: List[str], 
-                   on: Optional[str | List[str]] = None,
+                   on: Optional[Union[str, List[str], List[List[str]]]] = None,
                    how: str = 'inner',
                    suffixes: Optional[tuple] = None) -> pd.DataFrame:
     """Merge multiple CSV files iteratively.
     
     Args:
         input_files: List of CSV file paths to merge
-        on: Column(s) to merge on
+        on: Column(s) to merge on. Can be:
+            - A single column name (str) - used for all merges
+            - A list of column names for all tables (List[str])
+            - A list of lists where each inner list contains a key for that table (List[List[str]])
+              In this case, the keys are used in a pairwise progressive pattern:
+              For tables A, B, C with keys [['a'], ['b'], ['c']], the merges are:
+              A.merge(B, left_on=['a'], right_on=['b'])
+              result.merge(C, left_on=['b'], right_on=['c'])
         how: Type of merge to perform ('left', 'right', 'outer', 'inner')
         suffixes: Suffixes to apply to overlapping column names
         
@@ -53,17 +61,66 @@ def merge_csv_files(input_files: List[str],
     # Enforce that the number of suffixes matches the number of files
     assert len(suffixes) == len(input_files), f"Number of suffixes ({len(suffixes)}) must match number of input files ({len(input_files)})"
     
+    # Handle different types of 'on' parameter
+    if isinstance(on, list) and on and isinstance(on[0], list):
+        # Check if we have the right number of merge keys
+        if len(on) != len(input_files):
+            # If we have more merge keys than needed, use only the first ones
+            if len(on) > len(input_files):
+                logger.warning(f"Number of merge key lists ({len(on)}) is greater than number of input files ({len(input_files)}). Using only the first {len(input_files)} lists.")
+                merge_keys = on[:len(input_files)]
+            else:
+                # If we have fewer merge keys than needed, repeat the last one
+                logger.warning(f"Number of merge key lists ({len(on)}) is less than number of input files ({len(input_files)}). Repeating the last merge key list.")
+                merge_keys = on + [on[-1]] * (len(input_files) - len(on))
+        else:
+            merge_keys = on
+    else:
+        # If on is a string or list of strings, use the same for all merges
+        merge_keys = [on] * len(input_files)
+    
     # Iteratively merge remaining files
     for i, file in enumerate(input_files[1:], 1):
         df = pd.read_csv(file)
         logger.info(f"Merging file: {file} with shape {df.shape}")
         
-        result = result.merge(
-            df,
-            on=on,
-            how=how,
-            suffixes=(suffixes[i-1], suffixes[i])
-        )
+        # Get merge parameters for this iteration
+        left_key = merge_keys[i-1]
+        right_key = merge_keys[i]
+        
+        # Handle different merge key scenarios
+        if isinstance(left_key, list) and isinstance(right_key, list):
+            if len(left_key) == 1 and len(right_key) == 1:
+                # If we have single keys, use them directly
+                left_on = left_key[0]
+                right_on = right_key[0]
+                logger.info(f"Using left_on={left_on}, right_on={right_on} for merge")
+                result = result.merge(
+                    df,
+                    left_on=left_on,
+                    right_on=right_on,
+                    how=how,
+                    suffixes=(suffixes[i-1], suffixes[i])
+                )
+            else:
+                # If we have multiple keys, use them as lists
+                logger.info(f"Using left_on={left_key}, right_on={right_key} for merge")
+                result = result.merge(
+                    df,
+                    left_on=left_key,
+                    right_on=right_key,
+                    how=how,
+                    suffixes=(suffixes[i-1], suffixes[i])
+                )
+        else:
+            # If keys are strings or None, use them directly
+            logger.info(f"Using on={left_key} for merge")
+            result = result.merge(
+                df,
+                on=left_key,
+                how=how,
+                suffixes=(suffixes[i-1], suffixes[i])
+            )
         logger.info(f"Shape after merge: {result.shape}")
     
     return result

@@ -1,0 +1,10 @@
+employee_id,name,age,city,staff_id,salary,department,join_date,person_id,position,hire_date,manager
+1.0,John,30.0,New York,1.0,75000.0,Engineering,2020-01-15,1.0,Senior Engineer,2018-05-10,Tom
+2.0,Alice,25.0,Los Angeles,2.0,65000.0,Marketing,2019-06-20,2.0,Marketing Lead,2019-01-15,Sarah
+3.0,Bob,35.0,Chicago,3.0,85000.0,Engineering,2021-03-10,3.0,Engineering Manager,2020-06-20,Mike
+,,,,6.0,72000.0,HR,2022-01-05,,,,
+,,,,7.0,68000.0,Finance,2021-11-30 ,,,,
+,,,,,,,,8.0,Data Scientist,2021-09-01,John
+,,,,,,,,9.0,Product Manager,2022-03-15,Lisa 
+4.0,Emma,28.0,Boston,,,,,,,,
+5.0,Michael,40.0,San Francisco ,,,,,,,,

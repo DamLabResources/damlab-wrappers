@@ -1,0 +1,8 @@
+employee_id,name,age,city,staff_id,salary,department,join_date
+1.0,John,30.0,New York,1.0,75000.0,Engineering,2020-01-15
+2.0,Alice,25.0,Los Angeles,2.0,65000.0,Marketing,2019-06-20
+3.0,Bob,35.0,Chicago,3.0,85000.0,Engineering,2021-03-10
+4.0,Emma,28.0,Boston,,,,
+5.0,Michael,40.0,San Francisco ,,,,
+,,,,6.0,72000.0,HR,2022-01-05
+,,,,7.0,68000.0,Finance,2021-11-30 

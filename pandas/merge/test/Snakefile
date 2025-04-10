@@ -9,7 +9,9 @@ rule all:
         "test_output/inner_merge.csv",
         "test_output/outer_merge.csv",
         "test_output/no_on_merge.csv",
-        "test_output/three_file_merge.csv"
+        "test_output/three_file_merge.csv",
+        "test_output/different_columns_merge.csv",
+        "test_output/three_file_different_columns_merge.csv"
     conda: "env.yaml"
     shell: "pytest tests.py"
 
@@ -59,4 +61,26 @@ rule test_three_file_merge:
         how="outer",
         suffixes=("_first", "_second", "_third")
     wrapper:
-        "file:../" 
+        "file:../"
+
+rule different_columns_merge:
+    input:
+        csv_files=["test_data4.csv", "test_data5.csv"]
+    output:
+        "test_output/different_columns_merge.csv"
+    params:
+        on=[["employee_id"], ["staff_id"]],
+        how="outer"
+    wrapper:
+        "file:../"
+
+rule three_file_different_columns_merge:
+    input:
+        csv_files=["test_data4.csv", "test_data5.csv", "test_data6.csv"]
+    output:
+        "test_output/three_file_different_columns_merge.csv"
+    params:
+        on=[["employee_id"], ["staff_id"], ["person_id"]],
+        how="outer"
+    wrapper:
+        "file:../"
