@@ -1,23 +1,39 @@
-"""Wrapper for seqkit amplicon to check primers"""
+"""Wrapper for seqkit amplicon to check primers.
+
+This wrapper provides a Snakemake interface to the seqkit amplicon tool,
+allowing users to check primers against sequence reads and produce a summary CSV file.
+For each read, it reports the amplicon length for each primer pair (or None if no match).
+"""
 
 __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
-from snakemake.shell import shell # type: ignore
 import csv
-from pathlib import Path
-from collections import defaultdict
-import yaml
-from itertools import combinations
+import os
 import tempfile
-from typing import Dict, Set, Optional, Union, List, Tuple
-import pysam
+from collections import defaultdict
+from itertools import combinations
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple, Union
 
+import pysam
+import yaml
+from snakemake.shell import shell  # type: ignore
+
+# This is a common pattern in Snakemake wrappers
+# It allows the wrapper to be imported without snakemake being in the global namespace
+# This is useful for testing and linting
 if "snakemake" not in locals():
-    #  Keeps linters happy but doesn't impact function
-    import snakemake # type: ignore
+    import snakemake  # type: ignore
+
+# Check if version is specified and compatible
+if hasattr(snakemake, "params") and "version" in snakemake.params:
+    requested_version = snakemake.params.version
+    if requested_version != __version__:
+        print(f"Warning: Requested version {requested_version} does not match wrapper version {__version__}")
 
 # Predefined primer sets
 PRIMER_SETS = {
@@ -73,6 +89,9 @@ def create_primer_file(
     with open(output_path, 'w') as f:
         # Add primers from file if provided
         if primer_file:
+            if not os.path.exists(primer_file):
+                raise FileNotFoundError(f"Primer file not found: {primer_file}")
+                
             with open(primer_file) as pf:
                 for line in pf:
                     f.write(line)
@@ -117,6 +136,9 @@ def parse_amplicon_results(bed_file: Path, all_primers: Optional[Set[str]] = Non
     results = defaultdict(dict)
     found_primers = set()
     
+    if not os.path.exists(bed_file):
+        raise FileNotFoundError(f"BED output file not found: {bed_file}")
+    
     with open(bed_file) as f:
         for line in f:
             fields = line.strip().split('\t')
@@ -149,6 +171,11 @@ def write_csv_results(
         results: Dictionary of results from parse_amplicon_results
         primer_names: Set of primer names from parse_amplicon_results
     """
+    # Ensure output directory exists
+    output_dir = os.path.dirname(output_path)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+    
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
         
@@ -177,6 +204,9 @@ def get_all_primer_names(primer_file: Optional[Path], primer_sets: Optional[Unio
     
     # Get primers from file
     if primer_file:
+        if not os.path.exists(primer_file):
+            raise FileNotFoundError(f"Primer file not found: {primer_file}")
+            
         with open(primer_file) as f:
             for line in f:
                 name = line.strip().split('\t')[0]
@@ -316,6 +346,10 @@ def extract_reads_from_bam(
         region: Optional region string (e.g. "chr1:1000-2000")
         log: Log redirect string for shell command
     """
+    # Validate input file exists
+    if not os.path.exists(bam_file):
+        raise FileNotFoundError(f"BAM file not found: {bam_file}")
+    
     # Parse region if provided
     region_info = None
     if region:
@@ -347,18 +381,22 @@ primers = snakemake.input.get("primers", None)
 output_csv = snakemake.output[0]
 summary_yaml = snakemake.output.get("summary", None)
 
+# Validate input reads exist
+if not os.path.exists(reads):
+    raise FileNotFoundError(f"Input reads file not found: {reads}")
+
 # Get optional parameters
-extra = snakemake.params.get("extra", "")
-sample_name = snakemake.params.get("sample_name", None)
-primer_sets = snakemake.params.get("primer_sets", None)
-region = snakemake.params.get("region", None)
-max_mismatch = snakemake.params.get("max_mismatch", 1)  # Default to 1 mismatch
+extra: str = snakemake.params.get("extra", "")
+sample_name: Optional[str] = snakemake.params.get("sample_name", None)
+primer_sets: Optional[Union[str, List[str]]] = snakemake.params.get("primer_sets", None)
+region: Optional[str] = snakemake.params.get("region", None)
+max_mismatch: int = snakemake.params.get("max_mismatch", 1)  # Default to 1 mismatch
 
 # Get threads
-threads = snakemake.threads
+threads: int = snakemake.threads
 
 # Setup log
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+log: str = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 with tempfile.TemporaryDirectory() as temp_dir:
     temp_primers = Path(temp_dir) / "primers.txt"

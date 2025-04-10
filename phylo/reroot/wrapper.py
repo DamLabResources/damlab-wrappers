@@ -1,30 +1,62 @@
-"""Wrapper for tree rerooting using dendropy"""
+"""Wrapper for tree rerooting using DendroPy.
+
+This wrapper provides a Snakemake interface to DendroPy's tree rerooting functionality,
+allowing users to reroot phylogenetic trees at a specified taxon. This is particularly
+useful for ensuring proper tree orientation and outgroup placement.
+"""
 
 __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
-import dendropy # type: ignore
+import os
+from pathlib import Path
+from typing import Optional
 
+import dendropy  # type: ignore
+
+# This is a common pattern in Snakemake wrappers
+# It allows the wrapper to be imported without snakemake being in the global namespace
+# This is useful for testing and linting
 if "snakemake" not in locals():
-    #  Keeps linters happy but doesn't impact funtion
-    import snakemake # type: ignore
+    import snakemake  # type: ignore
 
-# Extract arguments from snakemake object
-input_tree = snakemake.input[0]
-output_tree = snakemake.output[0]
+# Check if version is specified and compatible
+if hasattr(snakemake, "params") and "version" in snakemake.params:
+    requested_version = snakemake.params.version
+    if requested_version != __version__:
+        print(f"Warning: Requested version {requested_version} does not match wrapper version {__version__}")
 
-# Get required root taxon parameter
-root_taxon = snakemake.params.get("root_taxon")
+# Get input and output files
+input_tree: str = snakemake.input[0]
+output_tree: str = snakemake.output[0]
+
+# Validate input file exists
+if not os.path.exists(input_tree):
+    raise FileNotFoundError(f"Input file {input_tree} does not exist")
+
+# Get parameters with defaults
+# This is a common pattern in wrappers - providing sensible defaults
+root_taxon: Optional[str] = snakemake.params.get("root_taxon")
+schema: str = snakemake.params.get("schema", "newick")  # Default to newick format
+preserve_branch_lengths: bool = snakemake.params.get("preserve_branch_lengths", True)
+preserve_support_values: bool = snakemake.params.get("preserve_support_values", True)
+
+# Validate required parameters
 if not root_taxon:
     raise ValueError("root_taxon parameter must be specified")
 
 # Read the tree
-tree = dendropy.Tree.get(
-    path=input_tree,
-    schema="newick"
-)
+try:
+    tree = dendropy.Tree.get(
+        path=input_tree,
+        schema=schema,
+        preserve_underscores=True
+    )
+except Exception as e:
+    raise ValueError(f"Failed to read tree file: {str(e)}")
 
 # Find the node corresponding to the root taxon
 root_node = None
@@ -37,10 +69,22 @@ if not root_node:
     raise ValueError(f"Root taxon '{root_taxon}' not found in tree")
 
 # Reroot the tree
-tree.reroot_at_node(root_node)
+try:
+    tree.reroot_at_node(
+        root_node,
+        update_bipartitions=True
+    )
+except Exception as e:
+    raise ValueError(f"Failed to reroot tree: {str(e)}")
 
 # Write the rerooted tree
-tree.write(
-    path=output_tree,
-    schema="newick"
-) 
+try:
+    tree.write(
+        path=output_tree,
+        schema=schema,
+        suppress_edge_lengths=not preserve_branch_lengths,
+        suppress_internal_node_labels=not preserve_support_values,
+        preserve_underscores=True
+    )
+except Exception as e:
+    raise ValueError(f"Failed to write rerooted tree: {str(e)}") 

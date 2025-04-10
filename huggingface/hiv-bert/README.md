@@ -2,6 +2,12 @@
 
 A Snakemake wrapper for running sequences through HIV-BERT models from HuggingFace. This wrapper handles both DNA and amino acid sequences, automatically detecting and processing them appropriately.
 
+## Version
+
+Current version: 1.0.0 (First stable release)
+
+For a detailed list of changes, see the [CHANGELOG.md](CHANGELOG.md).
+
 ## Models
 
 The wrapper supports the following HIV-BERT models:
@@ -9,6 +15,10 @@ The wrapper supports the following HIV-BERT models:
 - `damlab/hiv_bert`: Base HIV-BERT model that provides sequence embeddings
 - `damlab/HIV_V3_bodysite`: Predicts HIV V3 sequence body site origin
 - `damlab/HIV_V3_coreceptor`: Predicts HIV V3 sequence co-receptor tropism
+
+## Usage
+
+For general information on how to use wrappers in Snakemake, please refer to the [root README.md](../../../README.md).
 
 ## Input
 
@@ -133,13 +143,23 @@ These dependencies are automatically managed through the conda environment speci
 6. Models are cached if model_directory is specified
 7. GPU is used automatically if available
 
-## Author
+## Error Handling
 
-Will Dampier (wnd22@drexel.edu)
+The wrapper includes comprehensive error handling for:
+- Invalid input files
+- Missing or invalid parameters
+- Model loading failures
+- Sequence processing errors
+- GPU/CPU resource issues
+- File I/O errors
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Author
+
+Will Dampier (wnd22@drexel.edu)
 
 ## Building the Environment on GPU Nodes
 

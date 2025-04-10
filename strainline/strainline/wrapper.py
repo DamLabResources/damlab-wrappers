@@ -4,6 +4,7 @@ __author__ = "Will Dampier"
 __copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
+__version__ = "1.0.0"
 
 import tempfile
 import shutil
@@ -11,15 +12,29 @@ from os.path import join
 import os
 from snakemake.shell import shell # type: ignore
 
-
 if "snakemake" not in locals():
-    #  Keeps linters happy but doesn't impact funtion
+    # Keeps linters happy but doesn't impact function
     import snakemake # type: ignore
 
-# Extract required arguments
+
+required_version = snakemake.params.get("version", __version__)
+if required_version != __version__:
+    print(f"Warning: Wrapper version {__version__} does not match required version {required_version}")
+
+# Extract and validate required arguments
 reads = snakemake.input[0]
+if not os.path.exists(reads):
+    raise FileNotFoundError(f"Input file {reads} does not exist")
+
 prefix = snakemake.params.get("prefix", "")
-platform = snakemake.params.get("platform", "ont")  # default to ONT
+if not prefix:
+    raise ValueError("prefix parameter must be specified")
+if not os.path.exists(prefix):
+    raise FileNotFoundError(f"Strainline installation directory {prefix} does not exist")
+
+platform = snakemake.params.get("platform", "ont")
+if platform not in ["ont", "pb"]:
+    raise ValueError(f"Invalid platform '{platform}'. Must be either 'ont' or 'pb'")
 
 # Determine output mode
 if len(snakemake.output) != 1:
@@ -34,7 +49,6 @@ elif snakemake.output.get('directory', False):
 else:
     raise ValueError("Exactly one output must be specified (either directory or haplotypes file)")
 
-# Build output argument
 # Get optional parameters with defaults matching help file
 extra_params = snakemake.params.get("extra_params", "")
 
@@ -46,11 +60,16 @@ log = snakemake.log_fmt_shell(stdout=False, stderr=True)
 
 # Ensure the strainline script path is correct
 strainline_path = os.path.join(prefix, "strainline", "src", "strainline.sh")
+if not os.path.exists(strainline_path):
+    raise FileNotFoundError(f"Strainline script not found at {strainline_path}")
 
 daccord = 'daccord-0.0.10-release-20170526170720-x86_64-etch-linux-gnu'
+daccord_path = os.path.join(prefix, daccord)
+if not os.path.exists(daccord_path):
+    raise FileNotFoundError(f"Daccord installation not found at {daccord_path}")
 
 # Build and execute command
-path_cmd = f"export PATH={prefix}/bin:{prefix}/{daccord}/bin:$PATH && "
+path_cmd = f"export PATH={prefix}/bin:{daccord_path}/bin:$PATH && "
 cmd = f"{strainline_path}"
 cmd += f" -i {reads}"
 cmd += f" -p {platform}"
@@ -59,9 +78,12 @@ cmd += f" {threads}"
 
 if is_directory:
     cmd += f" -o {output}"
-    shell(path_cmd + cmd)
+    shell(path_cmd + cmd + log)
 else:
     with tempfile.TemporaryDirectory(delete=False) as tmpdir:
         cmd += f" -o {tmpdir}"
-        shell(path_cmd + cmd)
-        shutil.move(join(tmpdir, "filter_by_abun", "haplotypes.final.fa"), output)
+        shell(path_cmd + cmd + log)
+        haplotype_file = join(tmpdir, "filter_by_abun", "haplotypes.final.fa")
+        if not os.path.exists(haplotype_file):
+            raise FileNotFoundError(f"Expected haplotype file {haplotype_file} not found after Strainline execution")
+        shutil.move(haplotype_file, output)
