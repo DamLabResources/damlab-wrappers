@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2024-04-10
 
 ### Added
-- Support for pairwise progressive pattern in the `on` parameter
 - Ability to merge tables with different column names for their keys
 - Better error handling and logging for merge operations
 

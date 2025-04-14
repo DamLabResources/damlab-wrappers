@@ -12,11 +12,19 @@ import logging
 from typing import List, Optional, Union, Tuple
 from pathlib import Path
 
-# Configure basic logging to stdout
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Configure logging to use Snakemake's log file
+if "snakemake" in locals():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        filename=snakemake.log[0] if hasattr(snakemake, 'log') else None
+    )
+else:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+
 logger = logging.getLogger('pandas-merge-wrapper')
 
 if "snakemake" not in locals():
