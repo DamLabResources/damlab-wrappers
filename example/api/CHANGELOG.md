@@ -5,6 +5,13 @@ All notable changes to this wrapper will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-04-14
+
+### Added
+ - Logging to the API example that is compatible with Snakemake `log:` directives.
+ - Added tests to ensure logging has information
+ 
+
 ## [1.0.0] - 2024-04-09
 
 ### Added

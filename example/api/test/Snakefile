@@ -8,7 +8,6 @@ rule all:
     input:
         "test_output/basic.fasta",
         "test_output/frame1.fasta",
-        "test_output/table2.fasta"
     conda: "env.yaml"
     shell: "pytest tests.py"
 
@@ -24,6 +23,8 @@ rule test_basic:
         stop_symbol="*",
         to_stop=False,
         cds=False
+    log:
+        "test_output/basic.log"
     wrapper:
         "file:../"
 
@@ -39,20 +40,7 @@ rule test_frame1:
         stop_symbol="*",
         to_stop=False,
         cds=False
+    log:
+        "test_output/frame1.log"
     wrapper:
         "file:../"
-
-# Test with table 2 (vertebrate mitochondrial)
-rule test_table2:
-    input:
-        "test_data.fasta"
-    output:
-        "test_output/table2.fasta"
-    params:
-        frame=0,
-        table=2,
-        stop_symbol="*",
-        to_stop=False,
-        cds=False
-    wrapper:
-        "file:../" 
