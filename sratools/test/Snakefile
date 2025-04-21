@@ -1,0 +1,29 @@
+from os.path import join
+import os
+
+# Create test output directory
+os.makedirs("test_output", exist_ok=True)
+
+rule all:
+    input:
+        "test_output/DRR537798.fastq"
+    conda: "env.yaml"
+    shell: "pytest tests.py"
+
+# Convert SRA to FASTQ directly
+rule convert_to_fastq:
+    input:
+        # No input needed as we're using accession directly
+    output:
+        "test_output/DRR537798.fastq"
+    params:
+        accession="DRR537798",
+        outdir="test_output",
+        format='fastq',
+        split_3=False,  # Don't split for single-ended data
+        threads=4,
+        progress=True,
+        include_technical=True,  # Include technical reads to get quality scores
+        skip_technical=False     # Don't skip technical reads
+    wrapper:
+        "file:../fasterq-dump" 
