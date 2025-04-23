@@ -1,18 +1,19 @@
 channels:
+  - pytorch
+  - nvidia
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
-  - python>=3.8
-  - pysam
+  - python=3.10
+  - pytorch=2.2.1
+  - pytorch-cuda=12.1
   - biopython
+  - pysam
   - pandas
-  - pillow
-  - numpy
+  - numpy=1.24.3
   - pyyaml
   - pip
   - pip:
     - transformers>=4.36.0
-    - torch>=1.13.1
     - sentencepiece
-    - protobuf 
+    - protobuf
