@@ -32,10 +32,10 @@ rule test_aa_v3:
         max_length = 256,
         sample_name = 'V3_Test_Sample',
         custom_env = custom_env
+    resources:
+        gpu=1
     log:
         stdout = join(build_dir, 'logs/aa_v3.log')
-    conda:
-        'env.yaml'
     wrapper:
         "file:../"
 
@@ -50,6 +50,8 @@ rule test_dna_v3:
         min_length = 10,
         max_length = 256,
         custom_env = custom_env
+    resources:
+        gpu=1
     log:
         stdout = join(build_dir, 'logs/dna_v3.log')
     wrapper:
@@ -66,6 +68,8 @@ rule test_proteins:
         min_length = 10,
         max_length = 256,
         custom_env = custom_env
+    resources:
+        gpu=1
     log:
         stdout = join(build_dir, 'logs/proteins.log')
     wrapper:
@@ -82,6 +86,8 @@ rule test_edge_cases:
         min_length = 10,
         max_length = 256,
         custom_env = custom_env
+    resources:
+        gpu=1
     log:
         stderr = join(build_dir, 'logs/edge_cases.log')
     wrapper:
