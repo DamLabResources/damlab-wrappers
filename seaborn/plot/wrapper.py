@@ -157,6 +157,7 @@ def main():
     plot_kwargs = snakemake.params.get('plot_kwargs', {})
     fig_kwargs = snakemake.params.get('fig_kwargs', {})
     axis_kwargs = snakemake.params.get('axis_kwargs', {})
+    fillna_kwargs = snakemake.params.get('fillna', None)  # Get optional fillna parameters
     
     # Convert plot_type and plot_kwargs to lists if they aren't already
     if not isinstance(plot_type, list):
@@ -172,7 +173,8 @@ def main():
         'plot_type': plot_type,
         'plot_kwargs': plot_kwargs,
         'fig_kwargs': fig_kwargs,
-        'axis_kwargs': axis_kwargs
+        'axis_kwargs': axis_kwargs,
+        'fillna': fillna_kwargs
     }
     
     try:
@@ -181,6 +183,12 @@ def main():
         
         df = pd.read_csv(input_file)
         logger.info(f"Read data with shape {df.shape}")
+
+        # Apply fillna if specified
+        if fillna_kwargs is not None:
+            logger.info(f"Filling NA values with parameters: {fillna_kwargs}")
+            df.fillna(inplace=True, **fillna_kwargs)
+            logger.info("NA values filled")
 
         # Create the plot
         create_seaborn_plot(

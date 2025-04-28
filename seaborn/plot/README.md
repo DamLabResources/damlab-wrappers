@@ -4,7 +4,7 @@ A Snakemake wrapper for creating seaborn plots from CSV data.
 
 ## Overview
 
-This wrapper provides a simple interface to create various types of seaborn plots from CSV data. It supports all seaborn plot types (barplot, histplot, scatterplot, etc.) and allows passing any additional parameters to the underlying seaborn functions. It also provides control over figure and axis properties. Multiple plots can be created on the same figure by providing lists of plot types and parameters.
+This wrapper provides a simple interface to create various types of seaborn plots from CSV data. It supports all seaborn plot types (barplot, histplot, scatterplot, etc.) and allows passing any additional parameters to the underlying seaborn functions. It also provides control over figure and axis properties. Multiple plots can be created on the same figure by providing lists of plot types and parameters. The wrapper also supports filling NA values in the data before plotting.
 
 ## Installation
 
@@ -49,6 +49,10 @@ rule create_plot:
             "ylim": [0, 100],
             "despine": True,
             "legend": True
+        },
+        fillna={        # Optional arguments for pandas fillna
+            "value": 0,  # Fill NA with 0
+            "method": "ffill"  # Forward fill
         }
     wrapper:
         "file:damlab-wrappers/seaborn/plot"
@@ -70,6 +74,12 @@ rule create_plot:
   - `despine`: Boolean or dictionary of arguments for sns.despine()
   - `legend`: Boolean or dictionary of arguments for ax.legend()
   - Any other valid axis setter methods (e.g., 'title', 'grid', etc.)
+- `fillna`: Optional dictionary of arguments to pass to pandas.DataFrame.fillna():
+  - `value`: Scalar value to use to fill NA values
+  - `method`: Method to use for filling holes in reindexed Series ('ffill', 'bfill', etc.)
+  - `axis`: Axis along which to fill missing values
+  - `inplace`: Whether to modify the DataFrame in place (always True in this wrapper)
+  - Any other valid pandas.DataFrame.fillna() parameters
 
 ### Outputs
 
@@ -93,6 +103,29 @@ rule create_barplot:
             "y": "value",
             "hue": "group",
             "ci": "sd"
+        }
+    wrapper:
+        "file:damlab-wrappers/seaborn/plot"
+```
+
+### Plot with NA Handling
+
+```python
+rule create_plot_with_na:
+    input:
+        "data.csv"
+    output:
+        "plot.png"
+    params:
+        plot="barplot",
+        plot_kwargs={
+            "x": "category",
+            "y": "value",
+            "hue": "group"
+        },
+        fillna={
+            "value": 0,  # Fill NA with 0
+            "method": "ffill"  # Forward fill remaining NA
         }
     wrapper:
         "file:damlab-wrappers/seaborn/plot"
@@ -133,37 +166,9 @@ rule create_complex_plot:
             "title": "Combined Scatter and Line Plot",
             "despine": True,
             "legend": {"title": "Groups", "loc": "upper right"}
-        }
-    wrapper:
-        "file:damlab-wrappers/seaborn/plot"
-```
-
-### Customized Scatterplot
-
-```python
-rule create_scatter:
-    input:
-        "data.csv"
-    output:
-        "scatter.png"
-    params:
-        plot="scatterplot",
-        plot_kwargs={
-            "x": "x_values",
-            "y": "y_values",
-            "hue": "group",
-            "size": "size_values"
         },
-        fig_kwargs={
-            "figsize": (12, 8),
-            "dpi": 300
-        },
-        axis_kwargs={
-            "xlabel": "X Values",
-            "ylabel": "Y Values",
-            "title": "Scatter Plot",
-            "despine": {"trim": True},
-            "legend": {"title": "Groups", "loc": "upper right"}
+        fillna={
+            "value": 0
         }
     wrapper:
         "file:damlab-wrappers/seaborn/plot"
