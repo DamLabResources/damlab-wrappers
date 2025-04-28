@@ -25,7 +25,9 @@ This Snakemake wrapper calculates the maximal deletion size for each read in a B
 
 ## Parameters
 
-- `sample_name` (optional): Name of the sample (default: "sample")
+- `min_size` (optional): The smallest deletion size considered for the block operation (default: 1). 
+- `sample_name` (optional): Name of the sample for the metrics file (default: "sample")
+
 
 ## Example Usage
 

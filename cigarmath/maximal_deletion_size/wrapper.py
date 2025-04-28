@@ -21,7 +21,7 @@ output_csv = snakemake.output[1]
 # Get parameters
 sample_name = snakemake.params.get("sample_name", "sample")
 chrom = snakemake.params.get("chrom")
-
+min_size = snakemake.params.get("min_size", 1)
 all_query_names = set()
 
 def _capture_query_names(stream):
@@ -72,7 +72,7 @@ for start, cigars, segments in combined_segment_stream:
     largest_deletion = None
     largest_deletion_size = 0
     
-    for del_block in cm.reference_deletion_blocks(cigars, start):
+    for del_block in cm.reference_deletion_blocks(cigars, reference_start=start, min_size=min_size):
         del_size = del_block[1] - del_block[0]
         if del_size > largest_deletion_size:
             largest_deletion = del_block
