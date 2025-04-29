@@ -1,0 +1,5 @@
+# Regex pattern matching metrics
+pattern_matches:
+  pattern_1: 2
+  pattern_2: 2
+total_reads: 4
