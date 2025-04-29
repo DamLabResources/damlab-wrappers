@@ -19,13 +19,14 @@ if "snakemake" not in locals():
 def get_regex_patterns(params):
     """Get regex patterns from parameters"""
     if 'patterns' not in params:
-        raise ValueError("No regex patterns provided in params. Please provide patterns as a list in the 'patterns' parameter.")
+        raise ValueError("No regex patterns provided in params. Please provide patterns as a dictionary in the 'patterns' parameter.")
     
     patterns = params['patterns']
-    if not isinstance(patterns, list):
-        raise ValueError("Patterns must be provided as a list")
+    if not isinstance(patterns, dict):
+        raise ValueError("Patterns must be provided as a dictionary where keys are column names and values are regex patterns")
     
-    return [regex.compile(pattern, flags=regex.BESTMATCH+regex.IGNORECASE) for pattern in patterns]
+    return {name: regex.compile(pattern, flags=regex.BESTMATCH+regex.IGNORECASE) 
+            for name, pattern in patterns.items()}
 
 def extract_matches(reg, text):
     """Extract first match from text using regex pattern"""
@@ -58,21 +59,31 @@ def get_sequence_reader(file_path):
     else:
         raise ValueError(f"Unsupported file format: {ext}")
 
+def iterate_reads(file_path):
+    """Iterate over sequence records in a file, handling compression and format automatically"""
+    reader = get_sequence_reader(file_path)
+    
+    # Open file with appropriate mode based on compression
+    if file_path.endswith('.gz'):
+        with gzip.open(file_path, 'rt') as handle:
+            yield from reader(file_path)
+    else:
+        with open(file_path, 'r') as handle:
+            yield from reader(file_path)
+
 def process_sequences(file_path, patterns):
     """Process sequence file and extract matches for each pattern"""
     results = []
-    reader = get_sequence_reader(file_path)
     
-    with open(file_path, 'rb') if not file_path.endswith('.gz') else gzip.open(file_path, 'rt') as handle:
-        for record in reader(file_path):
-            row = {'read_name': record.id}
-            
-            # Extract matches for each pattern
-            for i, pattern in enumerate(patterns):
-                match = extract_matches(pattern, str(record.seq))
-                row[f'pattern_{i+1}'] = match
-            
-            results.append(row)
+    for record in iterate_reads(file_path):
+        row = {'read_name': record.id}
+        
+        # Extract matches for each pattern
+        for name, pattern in patterns.items():
+            match = extract_matches(pattern, str(record.seq))
+            row[name] = match
+        
+        results.append(row)
     
     return pd.DataFrame(results)
 
@@ -95,8 +106,8 @@ if metrics_file:
     metrics = {
         'total_reads': int(len(df)),  # Convert to native Python int
         'pattern_matches': {
-            f'pattern_{i+1}': int(df[f'pattern_{i+1}'].notna().sum())  # Convert to native Python int
-            for i in range(len(patterns))
+            name: int(df[name].notna().sum())  # Convert to native Python int
+            for name in patterns.keys()
         }
     }
     

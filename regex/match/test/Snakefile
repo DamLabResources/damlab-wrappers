@@ -13,9 +13,9 @@ rule test_regex_match:
         csv="results/matches.csv",
         metrics="results/metrics.yaml"
     params:
-        patterns=lambda wildcards: [
-            r"ATGCCCTAG",  # Pattern 1: Exact match for seq1 and seq2
-            r"GATCCCCCTAG"   # Pattern 2: Exact match for seq1 and seq3
-        ]
+        patterns=lambda wildcards: {
+            'start_pattern': r"ATGCCCTAG",  # Pattern 1: Exact match for seq1 and seq2
+            'end_pattern': r"GATCCCCCTAG"   # Pattern 2: Exact match for seq1 and seq3
+        }
     wrapper:
         "file:../" 

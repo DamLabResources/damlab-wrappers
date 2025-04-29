@@ -28,7 +28,7 @@ def test_csv_content(csv_file):
     df = pd.read_csv(csv_file)
     
     # Check column names
-    expected_columns = ['read_name', 'pattern_1', 'pattern_2']
+    expected_columns = ['read_name', 'start_pattern', 'end_pattern']
     assert all(col in df.columns for col in expected_columns), "Missing expected columns"
     
     # Check number of rows
@@ -36,20 +36,20 @@ def test_csv_content(csv_file):
     
     # Check specific matches
     seq1_row = df[df['read_name'] == 'seq1']
-    assert not seq1_row['pattern_1'].isna().iloc[0], "Pattern 1 should match seq1"
-    assert not seq1_row['pattern_2'].isna().iloc[0], "Pattern 2 should match seq1"
+    assert not seq1_row['start_pattern'].isna().iloc[0], "Pattern 1 should match seq1"
+    assert not seq1_row['end_pattern'].isna().iloc[0], "Pattern 2 should match seq1"
     
     seq2_row = df[df['read_name'] == 'seq2']
-    assert not seq2_row['pattern_1'].isna().iloc[0], "Pattern 1 should match seq2"
-    assert seq2_row['pattern_2'].isna().iloc[0], "Pattern 2 should not match seq2"
+    assert not seq2_row['start_pattern'].isna().iloc[0], "Pattern 1 should match seq2"
+    assert seq2_row['end_pattern'].isna().iloc[0], "Pattern 2 should not match seq2"
     
     seq3_row = df[df['read_name'] == 'seq3']
-    assert seq3_row['pattern_1'].isna().iloc[0], "Pattern 1 should not match seq3"
-    assert not seq3_row['pattern_2'].isna().iloc[0], "Pattern 2 should match seq3"
+    assert seq3_row['start_pattern'].isna().iloc[0], "Pattern 1 should not match seq3"
+    assert not seq3_row['end_pattern'].isna().iloc[0], "Pattern 2 should match seq3"
     
     seq4_row = df[df['read_name'] == 'seq4']
-    assert seq4_row['pattern_1'].isna().iloc[0], "Pattern 1 should not match seq4"
-    assert seq4_row['pattern_2'].isna().iloc[0], "Pattern 2 should not match seq4"
+    assert seq4_row['start_pattern'].isna().iloc[0], "Pattern 1 should not match seq4"
+    assert seq4_row['end_pattern'].isna().iloc[0], "Pattern 2 should not match seq4"
 
 def test_metrics_content(metrics_file):
     """Test metrics output content"""
@@ -59,10 +59,10 @@ def test_metrics_content(metrics_file):
     # Check metrics structure
     assert 'total_reads' in metrics, "Missing total_reads in metrics"
     assert 'pattern_matches' in metrics, "Missing pattern_matches in metrics"
-    assert 'pattern_1' in metrics['pattern_matches'], "Missing pattern_1 count in metrics"
-    assert 'pattern_2' in metrics['pattern_matches'], "Missing pattern_2 count in metrics"
+    assert 'start_pattern' in metrics['pattern_matches'], "Missing pattern_1 count in metrics"
+    assert 'end_pattern' in metrics['pattern_matches'], "Missing pattern_2 count in metrics"
     
     # Check metrics values
     assert metrics['total_reads'] == 4, "Expected 4 total reads"
-    assert metrics['pattern_matches']['pattern_1'] == 2, "Expected 2 matches for pattern_1"
-    assert metrics['pattern_matches']['pattern_2'] == 2, "Expected 2 matches for pattern_2" 
+    assert metrics['pattern_matches']['start_pattern'] == 2, "Expected 2 matches for start_pattern"
+    assert metrics['pattern_matches']['end_pattern'] == 2, "Expected 2 matches for end_pattern" 
