@@ -4,7 +4,7 @@ This wrapper searches for regex patterns in FASTA files and outputs the matches 
 
 ## Input
 
-- FASTA file containing sequences to search
+- FASTX (optionally .gz) file containing sequences to search
 - List of regex patterns to search for
 
 ## Output

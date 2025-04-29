@@ -1,7 +1,7 @@
-"""Wrapper for regex pattern matching in FASTA files"""
+"""Wrapper for regex pattern matching in FASTA/FASTQ files"""
 
 __author__ = "Will Dampier"
-__copyright__ = "Copyright 2025"
+__copyright__ = "Copyright 2024"
 __email__ = "wnd22@drexel.edu"
 __license__ = "MIT"
 __version__ = "1.0.0"
@@ -10,7 +10,8 @@ import regex
 import pandas as pd
 from Bio import SeqIO
 import yaml
-
+import gzip
+import os
 
 if "snakemake" not in locals():
     import snakemake # type: ignore
@@ -33,32 +34,58 @@ def extract_matches(reg, text):
         return match[0]
     return None
 
-def process_fasta(fasta_path, patterns):
-    """Process FASTA file and extract matches for each pattern"""
-    results = []
+def get_sequence_reader(file_path):
+    """Determine the appropriate sequence reader based on file extension"""
+    _, ext = os.path.splitext(file_path)
+    ext = ext.lower()
     
-    for record in SeqIO.parse(fasta_path, "fasta"):
-        row = {'read_name': record.id}
-        
-        # Extract matches for each pattern
-        for i, pattern in enumerate(patterns):
-            match = extract_matches(pattern, str(record.seq))
-            row[f'pattern_{i+1}'] = match
-        
-        results.append(row)
+    # Handle gzipped files
+    if ext == '.gz':
+        _, base_ext = os.path.splitext(file_path[:-3])  # Remove .gz and get base extension
+        base_ext = base_ext.lower()
+        if base_ext in ['.fasta', '.fa', '.fna']:
+            return lambda f: SeqIO.parse(gzip.open(f, 'rt'), 'fasta')
+        elif base_ext in ['.fastq', '.fq']:
+            return lambda f: SeqIO.parse(gzip.open(f, 'rt'), 'fastq')
+        else:
+            raise ValueError(f"Unsupported gzipped file format: {base_ext}")
+    
+    # Handle uncompressed files
+    if ext in ['.fasta', '.fa', '.fna']:
+        return lambda f: SeqIO.parse(f, 'fasta')
+    elif ext in ['.fastq', '.fq']:
+        return lambda f: SeqIO.parse(f, 'fastq')
+    else:
+        raise ValueError(f"Unsupported file format: {ext}")
+
+def process_sequences(file_path, patterns):
+    """Process sequence file and extract matches for each pattern"""
+    results = []
+    reader = get_sequence_reader(file_path)
+    
+    with open(file_path, 'rb') if not file_path.endswith('.gz') else gzip.open(file_path, 'rt') as handle:
+        for record in reader(file_path):
+            row = {'read_name': record.id}
+            
+            # Extract matches for each pattern
+            for i, pattern in enumerate(patterns):
+                match = extract_matches(pattern, str(record.seq))
+                row[f'pattern_{i+1}'] = match
+            
+            results.append(row)
     
     return pd.DataFrame(results)
 
 # Get input/output paths
-fasta_in_path = str(snakemake.input[0])
+seq_in_path = str(snakemake.input[0])
 csv_out_path = str(snakemake.output[0])
 metrics_file = snakemake.output.get('metrics', None)
 
 # Get regex patterns
 patterns = get_regex_patterns(dict(snakemake.params))
 
-# Process FASTA file
-df = process_fasta(fasta_in_path, patterns)
+# Process sequence file
+df = process_sequences(seq_in_path, patterns)
 
 # Write results to CSV
 df.to_csv(csv_out_path, index=False)

@@ -4,7 +4,7 @@ rule all:
         "results/metrics.yaml"
     conda: 'env.yaml'
     shell:
-        'pytest'
+        'pytest tests.py'
 
 rule test_regex_match:
     input:
