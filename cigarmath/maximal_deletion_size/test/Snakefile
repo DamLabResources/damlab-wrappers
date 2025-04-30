@@ -1,0 +1,27 @@
+rule all:
+    input:
+        'test_output.yaml',
+        'test_read_level.csv'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_maximal_deletion_size:
+    input:
+        'test.bam'
+    output:
+        'test_output.yaml',
+        'test_read_level.csv'
+    params:
+        sample_name = 'test'
+    wrapper:
+        "file:../"
+
+rule:
+    input:
+        '../../test_data/test.sam'
+    output:
+        temp('test.bam')
+    params:
+        extra = '-n'
+    wrapper:
+        "v5.8.2/bio/samtools/sort" 
