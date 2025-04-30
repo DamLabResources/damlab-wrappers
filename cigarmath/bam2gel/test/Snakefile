@@ -1,0 +1,56 @@
+rule all:
+    input:
+        'test_gel.png',
+        'test_metrics.yaml',
+        'test_gel_multi.png'
+    conda: 'env.yaml'
+    shell: "pytest tests.py"
+
+rule test_bam2gel:
+    input:
+        'test.bam'
+    output:
+        'test_gel.png',
+        'test_metrics.yaml'
+    params:
+        mode = 'read_length',
+        names = ['test_sample'],
+        bin_width = 250,
+        max_size = 10000
+    wrapper:
+        "file:../"
+
+
+rule test_bam2gel_multi:
+    input:
+        ['test.bam', 'test_sub.bam']
+    output:
+        'test_gel_multi.png',
+        
+    params:
+        mode = 'read_length',
+        names = ['test_sample', 'subseted'],
+        bin_width = 250,
+        max_size = 10000
+    wrapper:
+        "file:../"
+
+rule:
+    input:
+        'test.bam'
+    output:
+        temp('test_sub.bam')
+    params:
+        extra = '-s 2.1'
+    wrapper:
+        "v5.8.2/bio/samtools/view" 
+
+rule:
+    input:
+        '../../test_data/test.sam'
+    output:
+        temp('test.bam')
+    params:
+        extra = '-n'
+    wrapper:
+        "v5.8.2/bio/samtools/sort" 

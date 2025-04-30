@@ -1,0 +1,9 @@
+# Cigarmath BAM2GEL Metrics
+lanes:
+  test_sample:
+    max_size: 6858
+    mean_size: 5792.4944444444445
+    median_size: 6668.0
+    min_size: 323
+    total_reads: 180
+mode: read_length
