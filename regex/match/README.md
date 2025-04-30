@@ -31,6 +31,10 @@ This wrapper searches for regex patterns in FASTA/FASTQ files and outputs the ma
             'end_pattern': r"GAT[ATGC]{{5}}CTA"     # Correct: double curly braces
         }
     ```
+- `both_strands`: Boolean (default: False)
+  - If True, searches both the forward and reverse complement strands
+  - If a pattern is not found in the forward strand, the reverse complement is searched
+  - The first match found (either forward or reverse) is returned
 
 ## Example Usage
 
@@ -45,7 +49,8 @@ rule regex_match:
         patterns=lambda wildcards: {
             'start_pattern': r"ATG[ATGC]{{10,20}}TAG",  # Example pattern 1
             'end_pattern': r"GAT[ATGC]{{5,15}}CTA"      # Example pattern 2
-        }
+        },
+        both_strands=True  # Search both strands
     wrapper:
         "damlab-wrappers/regex/match"
 ```

@@ -9,6 +9,7 @@ __version__ = "1.0.0"
 import regex
 import pandas as pd
 from Bio import SeqIO
+from Bio.Seq import Seq
 import yaml
 import gzip
 import os
@@ -28,11 +29,20 @@ def get_regex_patterns(params):
     return {name: regex.compile(pattern, flags=regex.BESTMATCH+regex.IGNORECASE) 
             for name, pattern in patterns.items()}
 
-def extract_matches(reg, text):
-    """Extract first match from text using regex pattern"""
+def extract_matches(reg, text, both_strands=False):
+    """Extract first match from text using regex pattern, optionally checking both strands"""
+    # Try forward strand first
     match = reg.findall(text)
     if match:
         return match[0]
+    
+    # If no match and both_strands is True, try reverse complement
+    if both_strands:
+        rev_comp = str(Seq(text).reverse_complement())
+        match = reg.findall(rev_comp)
+        if match:
+            return match[0]
+    
     return None
 
 def get_sequence_reader(file_path):
@@ -71,7 +81,7 @@ def iterate_reads(file_path):
         with open(file_path, 'r') as handle:
             yield from reader(file_path)
 
-def process_sequences(file_path, patterns):
+def process_sequences(file_path, patterns, both_strands=False):
     """Process sequence file and extract matches for each pattern"""
     results = []
     
@@ -80,7 +90,7 @@ def process_sequences(file_path, patterns):
         
         # Extract matches for each pattern
         for name, pattern in patterns.items():
-            match = extract_matches(pattern, str(record.seq))
+            match = extract_matches(pattern, str(record.seq), both_strands)
             row[name] = match
         
         results.append(row)
@@ -92,11 +102,16 @@ seq_in_path = str(snakemake.input[0])
 csv_out_path = str(snakemake.output[0])
 metrics_file = snakemake.output.get('metrics', None)
 
+# Get parameters
+params = dict(snakemake.params)
+both_strands = params.get('both_strands', False)
+sample_name = params.get('sample_name', None)
+
 # Get regex patterns
-patterns = get_regex_patterns(dict(snakemake.params))
+patterns = get_regex_patterns(params)
 
 # Process sequence file
-df = process_sequences(seq_in_path, patterns)
+df = process_sequences(seq_in_path, patterns, both_strands)
 
 # Write results to CSV
 df.to_csv(csv_out_path, index=False)
@@ -110,6 +125,8 @@ if metrics_file:
             for name in patterns.keys()
         }
     }
+    if sample_name:
+        metrics['sample_name'] = sample_name
     
     with open(metrics_file, 'w') as f:
         f.write('# Regex pattern matching metrics\n')
