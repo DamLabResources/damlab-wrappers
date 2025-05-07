@@ -15,6 +15,9 @@ Collect wrapper level changes here until merged.
  - `cigarmath/bam2gel` [1.0.1] Added `log_scale` to  to improve resolution in gel images.
 
 
+## Fixed
+ - `cigarmath/deletion_frequency` [1.1.0] - Split full and partial deletions into different fields for improved downstream visualization.
+
 
 ### Docs
   - [`cigarmath/bam2gel`](cigarmath/bam2gel/README.md) - Improved customization documentation for gels.
