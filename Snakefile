@@ -1,0 +1,40 @@
+import os
+from pathlib import Path
+from snakemake.utils import min_version
+
+# Require Snakemake 7.0 or higher for better module support
+min_version("7.0")
+
+# Get the base directory of the project
+BASE_DIR = Path(workflow.basedir)
+
+# Common configuration
+# configfile: "test_configs/default.txt"
+
+# Include all test Snakefiles
+# These will be loaded dynamically based on the test configuration
+def get_test_snakefiles():
+    with open(config["test_config"], "r") as f:
+        tools = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+    return [f"{tool}/test/Snakefile" for tool in tools]
+
+# TODO: Once migrated, this will do all tests
+# Include all test Snakefiles
+# for snakefile in get_test_snakefiles():
+#    include: snakefile
+
+include: "example/shell/test/Snakefile"
+
+
+# Rule to run all tests with coverage
+rule test_all:
+    input:
+        # From each test, capture the final log file   
+        # With --forceall this will rerun the entire suite
+        rules.test_example__shell__all.log,
+        
+
+# Rule to clean test outputs
+rule clean_all:
+    shell: "rm -rf test_output/*"
+
