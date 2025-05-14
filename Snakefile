@@ -25,6 +25,8 @@ def get_test_snakefiles():
 
 include: "example/shell/test/Snakefile"
 include: "example/api/test/Snakefile"
+include: "barcode/extract/test/Snakefile"
+include: "barcode/correct/test/Snakefile"
 
 
 # Rule to run all tests with coverage
@@ -34,6 +36,8 @@ rule test_all:
         # With --forceall this will rerun the entire suite
         rules.test_example__shell__all.log,
         rules.test_example__api__all.log,
+        rules.test_barcode__extract__all.log,
+        rules.test_barcode__correct__all.log
         
 
 # Rule to clean test outputs
