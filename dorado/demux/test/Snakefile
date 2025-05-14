@@ -1,25 +1,29 @@
-from os.path import join
 
-wd = workflow.basedir
-TEST_DATA_DIR = join(wd, '../../tests')
+# Get the directory of the current Snakefile
+TEST_ROOT_dorado__demux = Path(workflow.snakefile).parent
 
-rule all:
+rule test_dorado__demux__all:
     input:
-        "test_bam/sample3.bam",
-        "test_bam/sample5.bam",
-        "test_bam/missing.bam",
-        "test_fastq/sample3.fastq",
-        "test_fastq/sample5.fastq",
-        "test_fastq/missing.fastq"
+        files = [TEST_ROOT_dorado__demux/"test_bam/sample3.bam",
+                TEST_ROOT_dorado__demux/"test_bam/sample5.bam",
+                TEST_ROOT_dorado__demux/"test_bam/missing.bam",
+                TEST_ROOT_dorado__demux/"test_fastq/sample3.fastq",
+                TEST_ROOT_dorado__demux/"test_fastq/sample5.fastq",
+                TEST_ROOT_dorado__demux/"test_fastq/missing.fastq",
+                ],
+        tests = [TEST_ROOT_dorado__demux/"tests.py"]
     conda: 'env.yaml'
-    shell: "pytest tests.py"
+    log: 
+        stdout = TEST_ROOT_dorado__demux/"test_output/pytest.stdout.log",
+        stderr = TEST_ROOT_dorado__demux/"test_output/pytest.stderr.log"
+    shell: "cd {TEST_ROOT_dorado__demux} && pytest {input.tests} > {log.stdout} 2> {log.stderr}"
 
 
-rule test_demux_bam:
+rule test_dorado__demux__bam:
     input:
-        reads = 'basecalled.bam'
+        reads = TEST_ROOT_dorado__demux/'basecalled.bam'
     output:
-        directory("test_bam")
+        directory(TEST_ROOT_dorado__demux/"test_bam")
     params:
         kit_name = "SQK-NBD114-24",
         barcode_to_output = {
@@ -29,13 +33,13 @@ rule test_demux_bam:
         }
     threads: 2
     wrapper:
-        "file:../" 
+        f"file:{TEST_ROOT_dorado__demux.parent}"
 
-rule test_demux_fastq:
+rule test_dorado__demux__fastq:
     input:
-        reads = 'basecalled.bam'
+        reads = TEST_ROOT_dorado__demux/'basecalled.bam'
     output:
-        directory("test_fastq")
+        directory(TEST_ROOT_dorado__demux/"test_fastq")
     params:
         kit_name = "SQK-NBD114-24",
         emit_fastq = True,
@@ -46,4 +50,4 @@ rule test_demux_fastq:
         }
     threads: 2
     wrapper:
-        "file:../" 
+        f"file:{TEST_ROOT_dorado__demux.parent}"

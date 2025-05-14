@@ -34,6 +34,10 @@ include: "cigarmath/maximal_deletion_size/test/Snakefile"
 include: "cigarmath/pileup/test/Snakefile"
 include: "cigarmath/slice/test/Snakefile"
 
+include: "dorado/demux/test/Snakefile"
+include: "dorado/duplex/test/Snakefile"
+include: "dorado/simplex/test/Snakefile"
+
 
 # Rule to run all tests with coverage
 rule test_all:
@@ -48,7 +52,10 @@ rule test_all:
         rules.test_cigarmath__DF__all.log,
         rules.test_cigarmath__MDS__all.log,
         rules.test_cigarmath__pileup__all.log,
-        rules.test_cigarmath__slice__all.log
+        rules.test_cigarmath__slice__all.log,
+        rules.test_dorado__demux__all.log,
+        rules.test_dorado__duplex__all.log,
+        rules.test_dorado__simplex__all.log
 
 # Rule to clean test outputs
 rule clean_all:
