@@ -7,6 +7,7 @@ min_version("7.0")
 
 # Get the base directory of the project
 BASE_DIR = Path(workflow.basedir)
+WRAPPER_VERSION = 'v6.0.0'
 
 # Common configuration
 # configfile: "test_configs/default.txt"
@@ -27,6 +28,7 @@ include: "example/shell/test/Snakefile"
 include: "example/api/test/Snakefile"
 include: "barcode/extract/test/Snakefile"
 include: "barcode/correct/test/Snakefile"
+include: "cigarmath/bam2gel/test/Snakefile"
 
 
 # Rule to run all tests with coverage
@@ -37,8 +39,8 @@ rule test_all:
         rules.test_example__shell__all.log,
         rules.test_example__api__all.log,
         rules.test_barcode__extract__all.log,
-        rules.test_barcode__correct__all.log
-        
+        rules.test_barcode__correct__all.log,
+        rules.test_cigarmath__bam2gel__all.log
 
 # Rule to clean test outputs
 rule clean_all:

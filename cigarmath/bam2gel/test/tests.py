@@ -3,12 +3,12 @@ import yaml
 
 def test_output_exists():
     """Test that output files were created"""
-    assert os.path.exists('test_gel.png')
-    assert os.path.exists('test_metrics.yaml')
+    assert os.path.exists('test_output/test_gel.png')
+    assert os.path.exists('test_output/test_metrics.yaml')
 
 def test_yaml_output_format():
     """Test that output YAML has correct structure and values"""
-    with open('test_metrics.yaml') as f:
+    with open('test_output/test_metrics.yaml') as f:
         metrics = yaml.safe_load(f)
     
     # Check required keys
@@ -42,7 +42,7 @@ def test_yaml_output_format():
 
 def test_metrics_consistency():
     """Test that YAML metrics are consistent with expected values"""
-    with open('test_metrics.yaml') as f:
+    with open('test_output/test_metrics.yaml') as f:
         metrics = yaml.safe_load(f)
     
     lane_metrics = metrics['lanes']['test_sample']
