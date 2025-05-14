@@ -1,5 +1,4 @@
 import os
-import pytest # type: ignore
 import yaml
 import csv
 

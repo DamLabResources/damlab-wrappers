@@ -5,12 +5,12 @@ import csv
 
 def test_output_exists():
     """Test that output files were created"""
-    assert os.path.exists('test_output.yaml')
-    assert os.path.exists('test_read_level.csv')
+    assert os.path.exists('test_output/test_output.yaml')
+    assert os.path.exists('test_output/test_read_level.csv')
 
 def test_yaml_output_format():
     """Test that output YAML has correct structure and values"""
-    with open('test_output.yaml') as f:
+    with open('test_output/test_output.yaml') as f:
         metrics = yaml.safe_load(f)
     
     # Check required keys
@@ -34,7 +34,7 @@ def test_yaml_output_format():
 
 def test_csv_output_format():
     """Test that CSV output has correct structure and values"""
-    with open('test_read_level.csv', 'r') as f:
+    with open('test_output/test_read_level.csv', 'r') as f:
         reader = csv.DictReader(f)
         rows = list(reader)
     
@@ -67,10 +67,10 @@ def test_csv_output_format():
 
 def test_metrics_consistency():
     """Test that YAML metrics are consistent with CSV data"""
-    with open('test_output.yaml') as f:
+    with open('test_output/test_output.yaml') as f:
         metrics = yaml.safe_load(f)
     
-    with open('test_read_level.csv', 'r') as f:
+    with open('test_output/test_read_level.csv', 'r') as f:
         reader = csv.DictReader(f)
         rows = list(reader)
     

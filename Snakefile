@@ -29,6 +29,10 @@ include: "example/api/test/Snakefile"
 include: "barcode/extract/test/Snakefile"
 include: "barcode/correct/test/Snakefile"
 include: "cigarmath/bam2gel/test/Snakefile"
+include: "cigarmath/deletion_frequency/test/Snakefile"
+include: "cigarmath/maximal_deletion_size/test/Snakefile"
+include: "cigarmath/pileup/test/Snakefile"
+include: "cigarmath/slice/test/Snakefile"
 
 
 # Rule to run all tests with coverage
@@ -40,7 +44,11 @@ rule test_all:
         rules.test_example__api__all.log,
         rules.test_barcode__extract__all.log,
         rules.test_barcode__correct__all.log,
-        rules.test_cigarmath__bam2gel__all.log
+        rules.test_cigarmath__bam2gel__all.log,
+        rules.test_cigarmath__DF__all.log,
+        rules.test_cigarmath__MDS__all.log,
+        rules.test_cigarmath__pileup__all.log,
+        rules.test_cigarmath__slice__all.log
 
 # Rule to clean test outputs
 rule clean_all:
