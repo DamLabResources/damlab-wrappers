@@ -43,8 +43,11 @@ include: "huggingface/hiv-bert/test/Snakefile"
 include: "MSA/muscle/test/Snakefile"
 include: "pandas/merge/test/Snakefile"
 
-# Rule to run all tests with coverage
+include: "phylo/FastTree/test/Snakefile"
+include: "phylo/phytreeviz/test/Snakefile"
+include: "phylo/reroot/test/Snakefile"
 
+# Rule to run all tests with coverage
 
 
 rule test_cpu:
@@ -62,7 +65,10 @@ rule test_cpu:
         rules.test_cigarmath__slice__all.log,
         rules.test_dorado__demux__all.log,
         rules.test_msa__muscle__all.log,
-        rules.test_pandas__merge__all.log
+        rules.test_pandas__merge__all.log,
+        rules.test_phylo__fasttree__all.log,
+        rules.test_phylo__phytreeviz__all.log,
+        rules.test_phylo__reroot__all.log
 
 
 rule test_gpu:
