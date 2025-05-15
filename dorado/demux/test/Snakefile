@@ -4,12 +4,8 @@ TEST_ROOT_dorado__demux = Path(workflow.snakefile).parent
 
 rule test_dorado__demux__all:
     input:
-        files = [TEST_ROOT_dorado__demux/"test_bam/sample3.bam",
-                TEST_ROOT_dorado__demux/"test_bam/sample5.bam",
-                TEST_ROOT_dorado__demux/"test_bam/missing.bam",
-                TEST_ROOT_dorado__demux/"test_fastq/sample3.fastq",
-                TEST_ROOT_dorado__demux/"test_fastq/sample5.fastq",
-                TEST_ROOT_dorado__demux/"test_fastq/missing.fastq",
+        files = [TEST_ROOT_dorado__demux/"test_bam",
+                TEST_ROOT_dorado__demux/"test_fastq",
                 ],
         tests = [TEST_ROOT_dorado__demux/"tests.py"]
     conda: 'env.yaml'
