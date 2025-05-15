@@ -40,6 +40,7 @@ include: "dorado/simplex/test/Snakefile"
 
 include: "huggingface/hiv-bert/test/Snakefile"
 
+include: "MSA/muscle/test/Snakefile"
 
 # Rule to run all tests with coverage
 
@@ -59,6 +60,7 @@ rule test_cpu:
         rules.test_cigarmath__pileup__all.log,
         rules.test_cigarmath__slice__all.log,
         rules.test_dorado__demux__all.log,
+        rules.test_msa__muscle__all.log
 
 
 rule test_gpu:
@@ -73,7 +75,4 @@ rule test_all:
         rules.test_cpu.input,
         rules.test_gpu.input,
 
-# Rule to clean test outputs
-rule clean_all:
-    shell: "rm -rf test_output/*"
 
