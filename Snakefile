@@ -38,9 +38,14 @@ include: "dorado/demux/test/Snakefile"
 include: "dorado/duplex/test/Snakefile"
 include: "dorado/simplex/test/Snakefile"
 
+include: "huggingface/hiv-bert/test/Snakefile"
+
 
 # Rule to run all tests with coverage
-rule test_all:
+
+
+
+rule test_cpu:
     input:
         # From each test, capture the final log file   
         # With --forceall this will rerun the entire suite
@@ -54,8 +59,19 @@ rule test_all:
         rules.test_cigarmath__pileup__all.log,
         rules.test_cigarmath__slice__all.log,
         rules.test_dorado__demux__all.log,
+
+
+rule test_gpu:
+    input:
         rules.test_dorado__duplex__all.log,
-        rules.test_dorado__simplex__all.log
+        rules.test_dorado__simplex__all.log,
+        rules.test_huggingface__hivbert__all.log
+
+
+rule test_all:
+    input:
+        rules.test_cpu.input,
+        rules.test_gpu.input,
 
 # Rule to clean test outputs
 rule clean_all:
