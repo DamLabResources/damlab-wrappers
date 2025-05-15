@@ -41,6 +41,7 @@ include: "dorado/simplex/test/Snakefile"
 include: "huggingface/hiv-bert/test/Snakefile"
 
 include: "MSA/muscle/test/Snakefile"
+include: "pandas/merge/test/Snakefile"
 
 # Rule to run all tests with coverage
 
@@ -60,7 +61,8 @@ rule test_cpu:
         rules.test_cigarmath__pileup__all.log,
         rules.test_cigarmath__slice__all.log,
         rules.test_dorado__demux__all.log,
-        rules.test_msa__muscle__all.log
+        rules.test_msa__muscle__all.log,
+        rules.test_pandas__merge__all.log
 
 
 rule test_gpu:
