@@ -23,9 +23,9 @@ rule test_dorado__demux__bam:
     params:
         kit_name = "SQK-NBD114-24",
         barcode_to_output = {
-            "barcode03": "sample3.bam",  # maps to sample3.bam
-            "barcode05": "sample5.bam",  # maps to sample5.bam
-            "barcode99": "missing.bam"   # should create empty file
+            "barcode03": "sample3",  # maps to sample3.bam
+            "barcode05": "sample5",  # maps to sample5.bam
+            "barcode99": "missing"   # should create empty file
         }
     threads: 2
     wrapper:
@@ -40,9 +40,9 @@ rule test_dorado__demux__fastq:
         kit_name = "SQK-NBD114-24",
         emit_fastq = True,
         barcode_to_output = {
-            "barcode03": "sample3.fastq",  # maps to sample3.fastq
-            "barcode05": "sample5.fastq",  # maps to sample5.fastq
-            "barcode99": "missing.fastq"   # should create empty file
+            "barcode03": "sample3",  # maps to sample3.fastq
+            "barcode05": "sample5",  # maps to sample5.fastq
+            "barcode99": "missing"   # should create empty file
         }
     threads: 2
     wrapper:
