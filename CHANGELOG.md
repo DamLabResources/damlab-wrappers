@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Collect wrapper level changes here until merged.
 
 ### Added
-  - `workflows/proviral_nfl` - Added strainline haplotype reconstruction and deletion block detection to the pipeline
+- [`CRISPR/crispresso-core`](CRISPR/crispresso-core/README.md) [1.0.0] - Wrapper for CRISPResso2 CRISPR editing quantification on a single amplicon. Amplicon sequence may be supplied as an inline string parameter or as a FASTA input file.
+- [`CRISPR/crispresso-compare`](CRISPR/crispresso-compare/README.md) [1.0.0] - Wrapper for CRISPRessoCompare pairwise comparison of two CRISPResso output directories.
+- `workflows/proviral_nfl` - Added strainline haplotype reconstruction and deletion block detection to the pipeline
   - New `rules/strainline.smk` module with `bam_to_fasta` and `strainline` rules (outputs to `strainline/` directory)
   - New `rules/deletion_detection.smk` module with `deletion_block_detection` rule (outputs to `deletion_detection/` directory)
   - Analysis outputs now included in MultiQC report
