@@ -92,7 +92,7 @@ def get_all_strainline_split_outputs(wildcards):
     ).output[0]
     categories = [
         c for c in glob_wildcards(
-            join(checkpoint_output, "{category}.fasta")
+            join(checkpoint_output, "{category}.fa")
         ).category
         if c != 'unclassified'
     ]
@@ -106,7 +106,7 @@ def get_all_strainline_split_outputs(wildcards):
 rule strainline_per_deletion:
     """Run Strainline haplotype reconstruction on each deletion-pattern FASTA."""
     input:
-        'deletion_split/{sample}/{category}.fasta'
+        'deletion_split/{sample}/{category}.fa'
     output:
         haplotypes='strainline_split/{sample}/{category}.haplotypes.fa'
     params:
