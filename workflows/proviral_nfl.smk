@@ -11,8 +11,23 @@ SNAKEMAKE_WRAPPER_TAG = config.get('snakemake_wrapper_tag', 'v8.1.1')
 WORKFLOW_DIR = workflow.basedir
 DL_PREFIX = config.get("damlab_prefix", join(WORKFLOW_DIR, "../../damlab-wrappers"))
 
+# Optional per-deletion samtools consensus (see rules/deletion_split.smk):
+#   CONSENSUS_MAX_PRIMARY_READS — int or null; if set, count with samtools view -c -F
+#     CONSENSUS_COUNT_FILTER_FLAGS (default 0x900), then subsample with samtools view
+#     --subsample / --subsample-seed when count exceeds the cap (handled in samtools/consensus wrapper).
+#   CONSENSUS_SUBSAMPLE_SEED — int, default 0
+#   CONSENSUS_COUNT_FILTER_FLAGS — string, default "0x900"
+# Validated in schemas/nanopore_run.yaml when present.
+
 # Load samples CSV
 SAMPLES = pd.read_csv(config.get('samples_csv', 'samples.csv'))
+
+# Prevent {sample} from matching intermediate filenames that contain dots,
+# which would cause PeriodicWildcardError between namesort_for_deletion_split
+# (deletion_split/{sample}.namesorted.bam) and the checkpoint output directory
+# (deletion_split/{sample}/).
+wildcard_constraints:
+    sample=r'[A-Za-z0-9_\-]+'
 
 # Include schema validation
 include: join(WORKFLOW_DIR, "schemas", "validate.smk")
@@ -53,9 +68,9 @@ def get_all_outputs(wildcards):
     for sample in get_all_samples():
         outputs.append(f'deletion_detection/{sample}.deletion_summary.yaml')
 
-    # Add per-deletion Strainline outputs
+    # Add per-deletion consensus + MSA outputs
     for sample in get_all_samples():
-        outputs.append(f'strainline_split/{sample}.done')
+        outputs.append(f'consensus_split/{sample}.msa.fasta')
 
     return outputs
 
