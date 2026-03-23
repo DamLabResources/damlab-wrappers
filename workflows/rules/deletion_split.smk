@@ -110,6 +110,7 @@ def get_all_consensus_outputs(wildcards):
         ).category
         if c != 'unclassified'
     ]
+
     return expand(
         'consensus_split/{sample}/{category}.stripped.fa',
         sample=wildcards.sample,
