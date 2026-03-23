@@ -100,7 +100,31 @@ Identifies large deletion blocks in aligned reads, useful for detecting defectiv
 **Rules:**
 - `deletion_block_detection` - Detects deletions above a configurable size threshold
 
-### 7. Reporting (`rules/reporting.smk`)
+### 7. Deletion-Pattern Split + Per-Deletion Strainline (`rules/deletion_split.smk`)
+
+Groups reads by their detected deletion pattern and reconstructs haplotypes independently for each group, enabling quasispecies analysis stratified by proviral deletion structure.
+
+**Stage overview:**
+```
+deletion_reads.csv + sorted.bam
+        ↓
+prepare_deletion_split_csv   (filter by span and category size → split_labels.csv)
+        ↓
+namesort_for_deletion_split  (samtools sort -n → namesorted.bam)
+        ↓
+checkpoint split_by_deletion_pattern  (cigarmath/split CSV mode → per-pattern FASTA files)
+        ↓
+strainline_per_deletion  (one Strainline job per FASTA, discovered via checkpoint)
+```
+
+**Rules:**
+- `prepare_deletion_split_csv` - Converts `deletion_reads.csv` to a `query_name`/`category` CSV, applying configurable read-span and per-category size filters
+- `namesort_for_deletion_split` - Name-sorts the aligned BAM so chimeric reads are merged during splitting
+- `split_by_deletion_pattern` *(checkpoint)* - Splits the name-sorted BAM into one FASTA per deletion pattern using the `cigarmath/split` wrapper
+- `strainline_per_deletion` - Runs Strainline haplotype reconstruction on each split FASTA
+- `all_deletion_split_strainline` - Aggregation rule that collects all per-deletion Strainline outputs for a sample
+
+### 8. Reporting (`rules/reporting.smk`)
 
 Aggregates all QC metrics into interactive HTML report.
 
@@ -205,6 +229,9 @@ demuxed_bam_path: /path/to/bam   # Skip basecalling, use pre-demuxed BAM
 # Analysis options
 STRAINLINE_PREFIX: /path/to/strainline  # Path to strainline installation
 MIN_DELETION_SIZE: 50                    # Minimum deletion size to detect (default: 50)
+DELETION_MERGE_DISTANCE: 10              # Max coordinate distance to merge similar deletion blocks (default: 10)
+MIN_REFERENCE_SIZE: 0                    # Minimum read reference span (reference_end - reference_start) to include in deletion split (default: 0, no filter)
+MIN_READS_PER_DELETION: 10              # Minimum reads in a deletion category to include in split; smaller categories go to unclassified (default: 10)
 ```
 
 ### Samples CSV Format
@@ -516,6 +543,20 @@ output/
 │   ├── sample1.deletion_blocks.csv   # Unique deletion blocks found
 │   ├── sample1.deletion_summary.yaml # Summary statistics
 │   └── ...
+├── deletion_split/               # Per-deletion-pattern split
+│   ├── sample1.split_labels.csv      # Filtered query_name → category mapping
+│   ├── sample1.namesorted.bam        # Temporary name-sorted BAM
+│   └── sample1/                      # FASTA per deletion pattern
+│       ├── intact.fasta              # Reads with no detected deletions
+│       ├── 1084-3594.fasta           # Reads with a single deletion
+│       ├── 1084-3594__6903-7666.fasta # Reads with two deletions
+│       └── ...
+├── strainline_split/             # Per-deletion Strainline haplotypes
+│   ├── sample1.done                  # Aggregation sentinel
+│   └── sample1/
+│       ├── intact.haplotypes.fa
+│       ├── 1084-3594.haplotypes.fa
+│       └── ...
 └── qc/                           # Final QC report
     ├── multiqc.html              # Interactive QC report
     └── multiqc_data/             # Supporting data files
@@ -525,8 +566,9 @@ output/
 
 **Primary Outputs:**
 - `aligned/{sample}.sorted.bam` - Final aligned BAM files for analysis
-- `strainline/{sample}.haplotypes.fa` - Reconstructed viral haplotypes
+- `strainline/{sample}.haplotypes.fa` - Reconstructed viral haplotypes (whole-sample)
 - `deletion_detection/{sample}.deletion_blocks.csv` - Detected deletion blocks
+- `strainline_split/{sample}/{category}.haplotypes.fa` - Per-deletion-pattern haplotypes
 - `qc/multiqc.html` - Comprehensive QC report (open in browser)
 
 **Intermediate Files:**
@@ -534,6 +576,8 @@ output/
 - `demux/{sample}.bam` - Demultiplexed reads per sample
 - `metrics/{sample}.depth.txt` - Per-position coverage
 - `deletion_detection/{sample}.deletion_summary.yaml` - Deletion statistics for MultiQC
+- `deletion_split/{sample}.split_labels.csv` - Filtered read → deletion-category mapping
+- `deletion_split/{sample}/` - Per-category FASTA files used as Strainline input
 
 ## Usage Examples
 

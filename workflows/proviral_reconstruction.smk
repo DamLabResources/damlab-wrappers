@@ -53,6 +53,7 @@ samples.csv columns:
 
 import os
 import itertools
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -167,6 +168,13 @@ if HAS_TREE_GROUPS:
 else:
     TREE_GROUPS = []
 
+# Constrain sample_name to only match real sample names from the CSV.
+# Without this, Snakemake can resolve e.g. fastq/HC69.downsampled.fastq
+# via bam_to_fastq with sample_name=HC69.downsampled instead of using the
+# downsample rule with sample_name=HC69.
+wildcard_constraints:
+    sample_name = "|".join(re.escape(s) for s in SAMPLES["sample_name"].tolist()),
+
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
@@ -213,6 +221,20 @@ def get_strainline_input(wildcards):
     if HAS_DOWNSAMPLE:
         return f"fastq/{wildcards.sample_name}.downsampled.fastq"
     return get_reads_input(wildcards)
+
+
+def get_bam2fastq_min_query_length_param(wildcards):
+    """Return min query length params for bam_to_fastq from optional CSV columns."""
+    row = get_sample(wildcards)
+    if "min_query_length" in SAMPLES.columns and _notna(row.get("min_query_length")):
+        return int(row["min_query_length"])
+
+
+def get_bam2fastq_max_query_length_param(wildcards):
+    """Return max query length params for bam_to_fastq from optional CSV columns."""
+    row = get_sample(wildcards)
+    if "max_query_length" in SAMPLES.columns and _notna(row.get("max_query_length")):
+        return int(row["max_query_length"])
 
 
 def get_samples_in_group(group):
@@ -268,13 +290,21 @@ rule bam_to_fastq:
 
     Triggered automatically when a sample's 'path' column points to a .bam file.
     Full read sequences are exported without region slicing.
+
+    Optional samples.csv columns:
+        min_query_length : discard reads shorter than this value (bp)
+        max_query_length : discard reads longer than this value (bp)
     """
     input:
         lambda wc: get_sample(wc)["path"],
     output:
         fastq = "fastq/{sample_name}.fastq",
     params:
-        mapped_only = True,
+        mapped_only      = True,
+        primary_only     = True,
+        unique_only      = True,
+        min_query_length = get_bam2fastq_min_query_length_param,
+        max_query_length = get_bam2fastq_max_query_length_param
     log:
         "logs/{sample_name}.bam2fastq.log",
     wrapper:
