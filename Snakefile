@@ -30,6 +30,7 @@ include: "barcode/extract/test/Snakefile"
 include: "barcode/correct/test/Snakefile"
 include: "cigarmath/bam2gel/test/Snakefile"
 include: "cigarmath/bam2csv/test/Snakefile"
+include: "cigarmath/bam2fastx/test/Snakefile"
 include: "cigarmath/deletion_frequency/test/Snakefile"
 include: "cigarmath/maximal_deletion_size/test/Snakefile"
 include: "cigarmath/pileup/test/Snakefile"
@@ -49,6 +50,10 @@ include: "phylo/FastTree/test/Snakefile"
 include: "phylo/phytreeviz/test/Snakefile"
 include: "phylo/reroot/test/Snakefile"
 
+include: "CRISPR/crispresso-core/test/Snakefile"
+include: "CRISPR/crispresso-compare/test/Snakefile"
+include: "CRISPR/crispresso-aggregate/test/Snakefile"
+
 # Rule to run all tests with coverage
 
 
@@ -62,6 +67,7 @@ rule test_cpu:
         rules.test_barcode__correct__all.log,
         rules.test_cigarmath__bam2gel__all.log,
         rules.test_cigarmath__bam2csv__all.log,
+        rules.test_cigarmath__bam2fastx__all.log,
         rules.test_cigarmath__DF__all.log,
         rules.test_cigarmath__MDS__all.log,
         rules.test_cigarmath__pileup__all.log,
@@ -73,6 +79,9 @@ rule test_cpu:
         rules.test_phylo__fasttree__all.log,
         rules.test_phylo__phytreeviz__all.log,
         rules.test_phylo__reroot__all.log,
+        rules.test_CRISPR__crispresso_core__all.log,
+        rules.test_CRISPR__crispresso_compare__all.log,
+        rules.test_CRISPR__crispresso_aggregate__all.log,
 
 
 rule test_gpu:
